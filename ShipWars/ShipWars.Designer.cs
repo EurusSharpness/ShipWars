@@ -2,7 +2,7 @@
 
 namespace ShipWars
 {
-    partial class Form1
+    partial class ShipWarsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -32,27 +32,34 @@ namespace ShipWars
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.Invalidator = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // timer1
+            // Invalidator
             // 
-            this.timer1.Tick += new System.EventHandler((o, e) => { Invalidate();});
+            this.Invalidator.Enabled = true;
+            this.Invalidator.Interval = 10;
+            this.Invalidator.Tick += new System.EventHandler(this.Invalidator_Tick);
             // 
-            // Form1
+            // ShipWarsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(933, 519);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(416, 135);
+            this.DoubleBuffered = true;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Name = "ShipWarsForm";
+            this.Text = "ShipWars";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ShipWarsForm_KeyDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ShipWarsForm_MouseMove);
             this.ResumeLayout(false);
         }
 
         #endregion
 
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer Invalidator;
     }
 }
