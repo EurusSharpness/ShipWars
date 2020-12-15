@@ -15,18 +15,96 @@ namespace ShipWars
     {
         private const int BoardSize = 14;
         private Cell[][] _gameBoard;
-        private Background bg;
-        private float dt;
-        private int angle = 45;
-        private Bitmap _background;
+        private readonly Background _bg;
+        private readonly float _dt;
+        private const int Angle = 45;
+        private readonly Bitmap _background;
+        private Point _selectedCell;
 
         public Game()
         {
-            bg = new Background();
-            dt = ShipWarsForm._ClientSize.Width * 0.015f;
+            _bg = new Background();
+            _dt = ShipWarsForm._ClientSize.Width * 0.015f;
             _background = new Bitmap(ShipWarsForm._ClientSize.Width, ShipWarsForm._ClientSize.Height,
                 PixelFormat.Format32bppArgb);
+            _selectedCell = new Point(-1, -1);
+
             CreateBoard();
+        }
+
+        public void MouseMove(MouseEventArgs e)
+        {
+            for (var i = 0; i < _gameBoard.Length; i++)
+            {
+                for (var j = 0; j < _gameBoard[i].Length; j++)
+                {
+                    if (!_gameBoard[i][j].MouseOver()) continue;
+                    (_selectedCell.X, _selectedCell.Y) = (i, j);
+                    return;
+                }
+            }
+            (_selectedCell.X, _selectedCell.Y) = (-1, -1);
+        }
+
+        public void MouseUp(MouseEventArgs e)
+        {
+        }
+
+        public void MouseDown(MouseEventArgs e)
+        {
+            if(_selectedCell.X == -1) return;
+            _gameBoard[_selectedCell.X][_selectedCell.Y].MouseClick(e);
+            Console.WriteLine(_selectedCell);
+        }
+
+        public void Draw(Graphics g)
+        {
+            _bg.Draw(g);
+            DrawGameMatrix(g);
+        }
+
+        private void DrawGameMatrix(Graphics g)
+        {
+            RotateRectangle(_gameBoard, g);
+
+            if (_selectedCell.X == -1) return;
+            var s = _gameBoard[_selectedCell.X][_selectedCell.Y].Rect;
+            RotateRectangle(s, g);
+
+        }
+
+        private void RotateRectangle(IReadOnlyList<Cell[]> r, Graphics g)
+        {
+            var m = new Matrix();
+            m.RotateAt(Angle,
+                new PointF(r[0][BoardSize - 1].Rect.Left + (r[BoardSize - 1][BoardSize - 1].Rect.Width / 2),
+                    r[0][BoardSize - 1].Rect.Top + (r[BoardSize][BoardSize - 1].Rect.Height / 2)));
+            g.Transform = m;
+            foreach (var rect in r)
+            {
+                foreach (var t in rect)
+                {
+                    if (t.Marked)
+                        g.FillRectangle(Brushes.Red, t.Rect.X, t.Rect.Y,
+                            t.Rect.Width, t.Rect.Height);
+                    g.DrawRectangle(new Pen(Brushes.Black, 2.4f), t.Rect.X, t.Rect.Y,
+                        t.Rect.Width, t.Rect.Height);
+                }
+            }
+            g.ResetTransform();
+        }
+
+        private void RotateRectangle(RectangleF r, Graphics g)
+        {
+            var m = new Matrix();
+            m.RotateAt(Angle,
+                new PointF(
+                    _gameBoard[0][BoardSize - 1].Rect.Left + (_gameBoard[BoardSize - 1][BoardSize - 1].Rect.Width / 2),
+                    _gameBoard[0][BoardSize - 1].Rect.Top + (_gameBoard[BoardSize][BoardSize - 1].Rect.Height / 2)));
+
+            g.Transform = m;
+            g.FillRectangle(Brushes.Gold, r);
+            g.ResetTransform();
         }
 
         private void CreateBoard()
@@ -34,13 +112,13 @@ namespace ShipWars
             _gameBoard = new Cell[BoardSize * 2][]; // Create 2 boards for each player, 14x14 each one.
 
             var dx = ShipWarsForm._ClientSize.Width * 0.5f;
-            var dy = dt * (BoardSize + 2);
+            var dy = _dt * (BoardSize + 2);
 
             // C^2 = A^2 + B^2 --> C^2 = (dt/2)^2 + (dt/2)^2 --> C = dt / Sqrt(2)
-            var d = dt / (float) Math.Sqrt(2);
+            var d = _dt / (float) Math.Sqrt(2);
 
             // this point is the far top point after rotation
-            var origin = new PointF(dx + dt / 2, dy - ((BoardSize - 1) - 0.5f) * dt - d);
+            var origin = new PointF(dx + _dt / 2, dy - ((BoardSize - 1) - 0.5f) * _dt - d);
 
             ////////////////UP///////////////////
             ////////////O///^//O////////////////
@@ -49,13 +127,13 @@ namespace ShipWars
             /////////////Down////////////////
             for (var k = 0; k < 2; k++)
             {
-                dx += (BoardSize + 1) * dt * k;
+                dx += (BoardSize + 1) * _dt * k;
                 for (var i = 0; i < BoardSize; i++)
                 {
                     _gameBoard[i + 14 * k] = new Cell[BoardSize];
                     for (var j = BoardSize - 1; j >= 0; j--)
                     {
-                        var (x, y) = (dx + dt * i, dy - j * dt);
+                        var (x, y) = (dx + _dt * i, dy - j * _dt);
 
                         var up = new PointF(origin.X + d * (i - BoardSize + 1 + j + (BoardSize + 1) * k),
                             origin.Y + d * (i + (BoardSize - 1 - j) + (BoardSize + 1) * k));
@@ -65,47 +143,10 @@ namespace ShipWars
 
 
                         _gameBoard[i + BoardSize * k][j] =
-                            new Cell(new RectangleF(x, y, dt, dt), new[] {left, up, right, down});
+                            new Cell(new RectangleF(x, y, _dt, _dt), new[] {left, up, right, down});
                     }
                 }
             }
-
-            RotateRectangle(_gameBoard);
-        }
-
-        public void Draw(Graphics g)
-        {
-            bg.Draw(g);
-            DrawGameMatrix(g);
-        }
-
-        private void DrawGameMatrix(Graphics g)
-        {
-            g.DrawImage(_background, 0, 0);
-
-            // TODO: Make every cell aware of mouse movement
-            /*if (t.Marked)
-                g.FillRectangle(Brushes.Red, t.Rect.X, t.Rect.Y, t.Rect.Width,
-                    t.Rect.Height);
-            else if (t.MouseOver())
-                g.FillRectangle(Brushes.Gold, t.Rect.X, t.Rect.Y, t.Rect.Width,
-                    t.Rect.Height);*/
-        }
-
-        private void RotateRectangle(IReadOnlyList<Cell[]> r)
-        {
-            using var g = Graphics.FromImage(_background);
-            var m = new Matrix();
-            m.RotateAt(angle,
-                new PointF(r[0][BoardSize - 1].Rect.Left + (r[BoardSize - 1][BoardSize - 1].Rect.Width / 2),
-                    r[0][BoardSize - 1].Rect.Top + (r[BoardSize][BoardSize - 1].Rect.Height / 2)));
-            g.Transform = m;
-            foreach (var rect in r)
-                foreach (var t in rect)
-                    g.DrawRectangle(new Pen(Brushes.Black, 2.4f), t.Rect.X, t.Rect.Y,
-                        t.Rect.Width, t.Rect.Height);
-
-            g.ResetTransform();
         }
 
         private class Cell
@@ -129,6 +170,12 @@ namespace ShipWars
             public bool MouseOver()
             {
                 return _path.IsVisible(ShipWarsForm._MouseCords);
+            }
+
+            public void MouseClick(MouseEventArgs e)
+            {
+                if (e.Button == MouseButtons.Left)
+                    Marked = true;
             }
         }
 
@@ -171,26 +218,8 @@ namespace ShipWars
 
             public void Draw(Graphics g)
             {
-                if (_x < ShipWarsForm._ClientSize.Width) _x += 1.5f;
-                else _x = 0;
-
+                _x = (_x < ShipWarsForm._ClientSize.Width) ? _x + 1.5f : 0;
                 g.DrawImage(background, _x - ShipWarsForm._ClientSize.Width, 0);
-
-                var ship = Properties.Resources.TestShip;
-                g.DrawImage(ship,
-                    new RectangleF(500, 500, 13 * 5, 13 * 5),
-                    new RectangleF(0, 0, ship.Width, ship.Height),
-                    GraphicsUnit.Pixel
-                );
-                // RotatePicture(g, ship, new PointF(500,500));
-            }
-
-            private void RotatePicture(Graphics g, Image im, PointF point)
-            {
-                var m = new Matrix();
-                m.RotateAt(45, new PointF(im.Width / 2f + point.X, im.Height / 2f + point.Y));
-                g.Transform = m;
-                g.ResetTransform();
             }
         }
     }

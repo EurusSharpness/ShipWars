@@ -43,6 +43,7 @@ namespace ShipWars
         private void ShipWarsForm_MouseMove(object sender, MouseEventArgs e)
         {
             _MouseCords = e.Location;
+            _mainClass.MouseMove(e);
         }
 
         private void ShipWarsForm_KeyDown(object sender, KeyEventArgs e)
@@ -55,7 +56,12 @@ namespace ShipWars
 
         private void ShipWarsForm_MouseUp(object sender, MouseEventArgs e)
         {
+            _mainClass.MouseUp(e);
+        }
 
+        private void ShipWarsForm_MouseDown(object sender, MouseEventArgs e)
+        {
+            _mainClass.MouseDown(e);
         }
     }
 }

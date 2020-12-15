@@ -17,6 +17,7 @@ namespace ShipWars
         Pause
     };
 
+    
     public class MainMenu
     {
         private Button _start, _help, _settings;
@@ -33,7 +34,10 @@ namespace ShipWars
             Menu = Menus.Main;
             CreateButtons();
         }
-
+        public void MouseDown(MouseEventArgs e)
+        {
+            Console.WriteLine("hello");
+        }
         public void Draw(Graphics g)
         {
             var x = 0;
