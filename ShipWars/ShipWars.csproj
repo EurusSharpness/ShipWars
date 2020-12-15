@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\WaterBackground.png" />
+    <None Include="Resources\TestShip.png" />
     <None Include="Resources\WaterBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -43,10 +43,10 @@ namespace ShipWars
             // 
             // ShipWarsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(416, 135);
+            this.ClientSize = new System.Drawing.Size(357, 117);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "ShipWarsForm";
@@ -55,7 +55,9 @@ namespace ShipWars
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form1_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ShipWarsForm_KeyDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ShipWarsForm_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ShipWarsForm_MouseUp);
             this.ResumeLayout(false);
+
         }
 
         #endregion

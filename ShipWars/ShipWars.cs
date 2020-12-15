@@ -32,7 +32,7 @@ namespace ShipWars
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
             _ClientSize = ClientSize;
             _mainClass.Draw(e.Graphics);
-            // e.Graphics.DrawString($"X: {_MouseCords.ToString()}", new Font("", 16), Brushes.Black, 0,0);
+            e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0,0);
         }
 
         private void Invalidator_Tick(object sender, EventArgs e)
@@ -51,6 +51,11 @@ namespace ShipWars
                 if(MessageBox.Show("Are you sure you want to exit?", "Exit", MessageBoxButtons.OKCancel) ==
                  DialogResult.OK)
                     Close();
+        }
+
+        private void ShipWarsForm_MouseUp(object sender, MouseEventArgs e)
+        {
+
         }
     }
 }
