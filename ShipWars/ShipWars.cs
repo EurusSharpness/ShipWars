@@ -14,13 +14,13 @@ namespace ShipWars
         public ShipWarsForm()
         {
             SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
-            
+
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width / 1.5),(int)(Screen.PrimaryScreen.WorkingArea.Height / 1.5));
+            ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width / 1.5), (int)(Screen.PrimaryScreen.WorkingArea.Height / 1.5));
             _Collection = Controls;
             _ClientSize = ClientSize;
             _mainClass = new MainClass();
@@ -32,7 +32,7 @@ namespace ShipWars
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
             _ClientSize = ClientSize;
             _mainClass.Draw(e.Graphics);
-            e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0,0);
+            //e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
         }
 
         private void Invalidator_Tick(object sender, EventArgs e)
@@ -49,7 +49,7 @@ namespace ShipWars
         private void ShipWarsForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                if(MessageBox.Show("Are you sure you want to exit?", "Exit", MessageBoxButtons.OKCancel) ==
+                if (MessageBox.Show("Are you sure you want to exit?", "Exit", MessageBoxButtons.OKCancel) ==
                  DialogResult.OK)
                     Close();
         }

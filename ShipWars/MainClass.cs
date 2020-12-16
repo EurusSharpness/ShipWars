@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace ShipWars
@@ -16,27 +15,27 @@ namespace ShipWars
 
         public void Draw(Graphics g)
         {
-            if(MainMenu.Menu == Menus.Game)
+            if (MainMenu.Menu == Menus.Game)
                 Game.Draw(g);
             else MainMenu.Draw(g);
         }
 
         public void MouseMove(MouseEventArgs e)
         {
-            if(MainMenu.Menu == Menus.Game)
-                Game.MouseMove(e);
+            if (MainMenu.Menu == Menus.Game)
+                Game.GameBoard.MouseMove(e);
         }
 
         public void MouseUp(MouseEventArgs e)
         {
             if (MainMenu.Menu == Menus.Game)
-                Game.MouseUp(e);
+                Game.GameBoard.MouseUp(e);
         }
 
         public void MouseDown(MouseEventArgs e)
         {
             if (MainMenu.Menu == Menus.Game)
-                Game.MouseDown(e);
+                Game.GameBoard.MouseDown(e);
         }
 
     }
