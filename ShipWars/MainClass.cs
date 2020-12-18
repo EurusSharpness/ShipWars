@@ -7,36 +7,39 @@ namespace ShipWars
     {
         public MainMenu MainMenu;
         public Game Game;
+
         public MainClass()
         {
             MainMenu = new MainMenu();
-            Game = new Game();
+            Game = null;
         }
 
         public void Draw(Graphics g)
         {
             if (MainMenu.Menu == Menus.Game)
+            {
+                Game ??= new Game();
                 Game.Draw(g);
+            }
             else MainMenu.Draw(g);
         }
 
         public void MouseMove(MouseEventArgs e)
         {
             if (MainMenu.Menu == Menus.Game)
-                Game.GameBoard.MouseMove(e);
+                Game?.MouseMove(e);
         }
 
         public void MouseUp(MouseEventArgs e)
         {
             if (MainMenu.Menu == Menus.Game)
-                Game.GameBoard.MouseUp(e);
+                Game?.MouseUp(e);
         }
 
         public void MouseDown(MouseEventArgs e)
         {
             if (MainMenu.Menu == Menus.Game)
-                Game.GameBoard.MouseDown(e);
+                Game?.MouseDown(e);
         }
-
     }
 }

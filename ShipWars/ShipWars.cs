@@ -11,6 +11,7 @@ namespace ShipWars
         public static Control.ControlCollection _Collection;
         public static Point _MouseCords;
         private MainClass _mainClass;
+
         public ShipWarsForm()
         {
             SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
@@ -20,10 +21,18 @@ namespace ShipWars
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width / 1.5), (int)(Screen.PrimaryScreen.WorkingArea.Height / 1.5));
+            Name = "Main";
+            Activate();
+            ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width * 0.8), (int)(Screen.PrimaryScreen.WorkingArea.Height * 0.8));
             _Collection = Controls;
             _ClientSize = ClientSize;
             _mainClass = new MainClass();
+
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+            AutoSize = false;
             Focus();
         }
 
@@ -32,24 +41,25 @@ namespace ShipWars
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
             _ClientSize = ClientSize;
             _mainClass.Draw(e.Graphics);
-            //e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
+            e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
         }
 
         private void Invalidator_Tick(object sender, EventArgs e)
         {
+            // (_MouseCords.X, _MouseCords.Y) = (-Location.X + Cursor.Position.X - 10, -Location.Y + Cursor.Position.Y - 30);
+            _MouseCords = PointToClient(Cursor.Position);
             Invalidate();
         }
 
         private void ShipWarsForm_MouseMove(object sender, MouseEventArgs e)
         {
-            _MouseCords = e.Location;
             _mainClass.MouseMove(e);
         }
 
         private void ShipWarsForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
-                if (MessageBox.Show("Are you sure you want to exit?", "Exit", MessageBoxButtons.OKCancel) ==
+                if (MessageBox.Show(@"Are you sure you want to exit?", @"Exit", MessageBoxButtons.OKCancel) ==
                  DialogResult.OK)
                     Close();
         }

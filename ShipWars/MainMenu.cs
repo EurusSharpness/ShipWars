@@ -16,7 +16,6 @@ namespace ShipWars
         Pause
     };
 
-
     public class MainMenu
     {
         private Button _start, _help, _settings;
@@ -28,6 +27,7 @@ namespace ShipWars
             "1: Place your ships, your ships can be rotated sideways\n" +
             "2: Destroy enemy ships by selecting one of the undestroyed cells on the enemy map.\n" +
             "3: Destroy the enemy ships before they destroy you.";
+
         public MainMenu()
         {
             Menu = Menus.Main;
@@ -43,34 +43,42 @@ namespace ShipWars
                     x = 1;
                     DrawMainPage(g);
                     break;
+
                 case Menus.Start:
                     x = 2;
                     DrawStartPage(g);
                     break;
+
                 case Menus.Help:
                     x = 3;
                     DrawHelpPage(g);
                     break;
+
                 case Menus.Settings:
                     x = 4;
                     DrawSettingsPage(g);
                     break;
+
                 case Menus.Game:
                     x = 5;
                     DrawGamePage(g);
                     break;
+
                 case Menus.Pause:
                     x = 6;
                     DrawPausePage(g);
                     break;
+
                 case Menus.Win:
                     x = 7;
                     DrawWinPage(g);
                     break;
+
                 case Menus.Lose:
                     x = 8;
                     DrawLosePage(g);
                     break;
+
                 default:
                     throw new IndexOutOfRangeException();
             }
@@ -154,7 +162,7 @@ namespace ShipWars
             _back.Visible = _back.Enabled = true;
         }
 
-        #endregion
+        #endregion DrawPages
 
         #region CreateButtons
 
@@ -164,7 +172,6 @@ namespace ShipWars
             _start = BasicButton("Start");
             _settings = BasicButton("Settings");
             _help = BasicButton("Help");
-
 
             _start.MouseClick += (sender, args) =>
             {
@@ -183,7 +190,6 @@ namespace ShipWars
             };
 
             // Set location for the buttons
-
 
             ShipWarsForm._Collection.Add(_start);
             ShipWarsForm._Collection.Add(_settings);
@@ -306,6 +312,6 @@ namespace ShipWars
 
         private Size GetHalf(Size a, Size b) => new Size((a.Width - b.Width) / 2, (a.Height - b.Height) / 2);
 
-        #endregion
+        #endregion CreateButtons
     }
 }
