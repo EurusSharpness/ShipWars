@@ -1,19 +1,32 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Linq;
 using System.Management.Instrumentation;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
 
 namespace ShipWars
 {
+    public static class Messages
+    {
+        public static string NotReady => @"You must put all your ships on the grid to start";
+        public static string SelectFromEnemy => @"You must select a cell from the enemy grid";
+        public static string CellAlreadyDestroyed => @"This cell is already destroyed";
+        public static string NotYourTurn => @"Wait for your turn";
+        public static string YouWon => @"You Won the Game, GZZZZZZZ!!!!";
+        public static string YouLost => @"You Lost the game BOOOOOOOOOOOOOOOO!!!";
+    }
+
     public class Game
     {
         private readonly GameBackground _background;
         private readonly GameBoard _gameBoard;
         private Player _player, _enemy;
         private bool _isReady;
-        private string _notReadyMsg = @"You must put all your ships on the grid to start";
+        private string Message;
         private int _alpha = 255;
-        private bool _notReadyFlag;
+        private bool _messageFlag;
+        private bool _playing; // true => player, false => enemy
 
         public Game()
         {
@@ -28,7 +41,6 @@ namespace ShipWars
 
         private void IsReady()
         {
-
             var RandomButton = new Button()
             {
                 Name = @"RandomButton",
@@ -74,10 +86,12 @@ namespace ShipWars
                 if (!_isReady)
                 {
                     _alpha = 255;
-                    _notReadyFlag = true;
+                    Message = Messages.NotReady;
+                    _messageFlag = true;
                 }
                 else
                 {
+                    _playing = true;
                     b.Enabled = false;
                     b.Visible = false;
                     RandomButton.Visible = RandomButton.Enabled = false;
@@ -95,11 +109,14 @@ namespace ShipWars
 
         private void ShipsToBoard()
         {
-
             foreach (var ship in _enemy.BattleShips)
             {
-                foreach (var index in ship.IndexPoints)
-                    _gameBoard.Board[index.Y][index.X].Color = new SolidBrush(ship.BackColor);
+                foreach (var cell in ship.IndexPoints.Select(index => _gameBoard.Board[index.Y][index.X]))
+                {
+                    cell.Color = new SolidBrush(Color.Transparent);
+                    cell.Cratif = true;
+                }
+
                 ship.Visible = false;
                 ship.Enabled = false;
                 ship.Dispose();
@@ -107,8 +124,11 @@ namespace ShipWars
 
             foreach (var ship in _player.BattleShips)
             {
-                foreach (var index in ship.IndexPoints)
-                    _gameBoard.Board[GameBoard.BoardSize + index.Y][index.X].Color = new SolidBrush(ship.BackColor);
+                foreach (var cell in ship.IndexPoints.Select(index => _gameBoard.Board[index.Y + GameBoard.BoardSize][index.X]))
+                {
+                    cell.Color = new SolidBrush(ship.BackColor);
+                    cell.Cratif = true;
+                }
                 ship.Visible = false;
                 ship.Enabled = false;
                 ship.Dispose();
@@ -125,15 +145,73 @@ namespace ShipWars
 
         public void MouseUp(MouseEventArgs e)
         {
-            if (_isReady)
-                _gameBoard.MouseUp(e);
+            if (!_isReady) return;
+
+            _gameBoard.MouseUp(e);
         }
+
+        #region POTAT
 
         public void MouseDown(MouseEventArgs e)
         {
-            if (_isReady)
-                _gameBoard.MouseDown(e);
+            if (!_isReady || _gameBoard._selectedCell.X == -1 || !_playing) return;
+            var selectedCell = _gameBoard.Board[_gameBoard._selectedCell.X][_gameBoard._selectedCell.Y];
+            if (_gameBoard._selectedCell.X >= GameBoard.BoardSize)
+            {
+                _messageFlag = true;
+                _alpha = 255;
+                Message = Messages.SelectFromEnemy;
+                return;
+            }
+
+            if (selectedCell.Destroyed)
+            {
+                _messageFlag = true;
+                _alpha = 255;
+                Message = Messages.CellAlreadyDestroyed;
+                return;
+            }
+
+            _gameBoard.MouseDown(e);
+            if (selectedCell.Cratif)
+            {
+                _enemy.HealthPoints--;
+                selectedCell.Color = Brushes.Crimson;
+                if (_enemy.HealthPoints == 0)
+                {
+                    _alpha = 255;
+                    _messageFlag = true;
+                    Message = Messages.YouWon;
+                    _playing = false;
+                }
+            }
+            EnemyDoStuff(e);
         }
+
+        private void EnemyDoStuff(MouseEventArgs e)
+        {
+            var r = new Random();
+            REPEAT:
+            var col = r.Next(0, GameBoard.BoardSize);
+            var row = r.Next(0, GameBoard.BoardSize);
+            var selectedCell = _gameBoard.Board[row + GameBoard.BoardSize][col];
+            if (selectedCell.Destroyed)
+                goto REPEAT;
+            selectedCell.MouseClick(e);
+            if (!selectedCell.Cratif) return;
+            _player.HealthPoints--;
+            _alpha = 255;
+            _messageFlag = true;
+            Message = _player.HealthPoints.ToString();
+            selectedCell.Color = Brushes.Crimson;
+            if (_player.HealthPoints != 0) return;
+            _alpha = 255;
+            _messageFlag = true;
+            Message = Messages.YouLost;
+            _playing = false;
+        }
+
+        #endregion
 
         public void Draw(Graphics g)
         {
@@ -145,14 +223,15 @@ namespace ShipWars
             else
                 _player.Draw(g);
 
-            if (!_notReadyFlag) return;
+            if (!_messageFlag) return;
             g.DrawString(
-                _notReadyMsg, new Font("", 28), new SolidBrush(Color.FromArgb(_alpha, 255, 0, 0)),
+                Message, new Font("", 28), new SolidBrush(Color.FromArgb(_alpha, 255, 0, 0)),
                 new PointF(
-                    (ShipWarsForm._ClientSize.Width - g.MeasureString(_notReadyMsg, new Font("", 28)).Width) / 2, 50));
-            _alpha--;
-            if (_alpha == 0)
-                _notReadyFlag = false;
+                    (ShipWarsForm._ClientSize.Width - g.MeasureString(Message, new Font("", 28)).Width) / 2, 50));
+            _alpha-=5;
+            if (_alpha != 0) return;
+            _messageFlag = false;
+            _alpha = 255;
         }
     }
 }

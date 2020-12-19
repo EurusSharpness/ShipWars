@@ -45,6 +45,7 @@ namespace ShipWars
 
         public void MouseUp(MouseEventArgs e)
         {
+
         }
 
         public void MouseDown(MouseEventArgs e)
@@ -135,11 +136,13 @@ namespace ShipWars
         {
             public readonly RectangleF Rect;
 
+            // If there is a ship on the cell.
+            public bool Cratif;
+            
             // If the cell is destroyed
             public bool Destroyed;
 
             // Left, Up, Right, Down.
-
             private readonly GraphicsPath _path;
             public Brush Color = Brushes.Transparent;
             public Cell(RectangleF rectangleF, PointF[] cords)
@@ -159,7 +162,6 @@ namespace ShipWars
                 if (e.Button != MouseButtons.Left) return;
                 Destroyed = true;
                 Color = Brushes.Red;
-
             }
         }
     }

@@ -14,8 +14,10 @@ namespace ShipWars
         private const int Dt = 30;
         private static int _dy;
         private static int _dx;
-        private bool[,] takenCells = new bool[GameBoard.BoardSize, GameBoard.BoardSize];
-        private bool _show;
+        private readonly bool[,] _takenCells = new bool[GameBoard.BoardSize, GameBoard.BoardSize];
+        private readonly bool _show;
+        public int HealthPoints = 32;
+
         public Player(bool show)
         {
             _show = show;
@@ -25,7 +27,6 @@ namespace ShipWars
             InitShips();
         }
 
-       
 
         private void InitShips()
         {
@@ -38,9 +39,10 @@ namespace ShipWars
 
             foreach (var ship in BattleShips)
                 ship.MouseUp += b_MouseUp;
-            if(_show)
+            if (_show)
                 ShipWarsForm._Collection.AddRange(BattleShips);
         }
+
         private void b_MouseUp(object sender, MouseEventArgs e)
         {
             var b = sender as BattleShip;
@@ -55,7 +57,7 @@ namespace ShipWars
         {
             if (b.Colum == -1) return;
             foreach (var p in b.IndexPoints)
-                takenCells[p.X, p.Y] = false;
+                _takenCells[p.X, p.Y] = false;
             b.IndexPoints.Clear();
         }
 
@@ -67,10 +69,9 @@ namespace ShipWars
             {
                 for (var j = 0; j < w; j++)
                 {
-                    if (!takenCells[b.Colum + j, b.Row + i]) continue;
-                        b.Reset();
-                        return false;
-
+                    if (!_takenCells[b.Colum + j, b.Row + i]) continue;
+                    b.Reset();
+                    return false;
                 }
             }
 
@@ -78,7 +79,7 @@ namespace ShipWars
             {
                 for (var j = 0; j < w; j++)
                 {
-                    takenCells[b.Colum + j, b.Row + i] = true;
+                    _takenCells[b.Colum + j, b.Row + i] = true;
                     b.IndexPoints.Add(new Point(b.Colum + j, b.Row + i));
                 }
             }
@@ -107,10 +108,10 @@ namespace ShipWars
             }
 
             // Check if the user moved the ship more than half a square.
-            var moveRight = ((b.Location.X - _dx) / (double)Dt) - (b.Location.X - _dx) / Dt;
+            var moveRight = ((b.Location.X - _dx) / (double) Dt) - (b.Location.X - _dx) / Dt;
             if (moveRight >= 0.5)
                 moveRight = 1;
-            var moveDown = ((b.Location.Y - _dy) / (double)Dt) - (b.Location.Y - _dy) / Dt;
+            var moveDown = ((b.Location.Y - _dy) / (double) Dt) - (b.Location.Y - _dy) / Dt;
             if (moveDown >= 0.5)
                 moveDown = 1;
 
@@ -120,13 +121,13 @@ namespace ShipWars
             if (deltaBottom > 0)
                 moveDown = 0;
 
-            b.Row = (int)moveDown + (b.Location.Y - _dy) / Dt;
-            b.Colum = (int)moveRight + (b.Location.X - _dx) / Dt;
+            b.Row = (int) moveDown + (b.Location.Y - _dy) / Dt;
+            b.Colum = (int) moveRight + (b.Location.X - _dx) / Dt;
 
             CheckShip(b);
         }
 
-        private bool AddShip(BattleShip b,int row, int col)
+        private bool AddShip(BattleShip b, int row, int col)
         {
             RemoveFomBoard(b);
 
@@ -228,6 +229,7 @@ namespace ShipWars
                 if (_doTurn)
                     (Height, Width) = (Width, Height);
             }
+
             private void b_MouseDown(object sender, MouseEventArgs e)
             {
                 Capture = true;
