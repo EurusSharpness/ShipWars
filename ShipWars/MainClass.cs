@@ -16,9 +16,18 @@ namespace ShipWars
 
         public void Draw(Graphics g)
         {
+
             if (MainMenu.Menu == Menus.Game)
             {
                 Game ??= new Game();
+                if (Game.PlayAgain)
+                    Game = new Game();
+                if (Game.BackToMainMenu)
+                {
+                    Game = null;
+                    MainMenu.Menu = Menus.Main;
+                    return;
+                }
                 Game.Draw(g);
             }
             else MainMenu.Draw(g);

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace ShipWars
@@ -23,7 +22,7 @@ namespace ShipWars
         public GameBoard()
         {
             _matrix = new Matrix();
-            _dt = Math.Min(ShipWarsForm._ClientSize.Width, ShipWarsForm._ClientSize.Height) * 0.028f;
+            _dt = Math.Min(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) * 0.028f;
             _selectedCell = new Point(-1, -1);
             CreateBoard();
         }
@@ -87,12 +86,12 @@ namespace ShipWars
         {
             Board = new Cell[BoardSize * 2][]; // Create 2 boards for each player, 14x14 each one.
 
-            var dx = ShipWarsForm._ClientSize.Width * 0.5f;
+            var dx = ShipWarsForm.CanvasSize.Width * 0.5f;
             var dy = _dt * (BoardSize + 2);
 
             // C^2 = A^2 + B^2 --> C^2 = (dt/2)^2 + (dt/2)^2 --> C = dt / Sqrt(2)
             // Half the radius of the circle around the square that is generated from rotation.
-            var r = _dt / (float) Math.Sqrt(2);
+            var r = _dt / (float)Math.Sqrt(2);
 
             // this point is the Top point of the top left square after rotation
             // X = Center horizontally, Y = Center vertically - r ==> the top point of the square.
@@ -121,7 +120,7 @@ namespace ShipWars
                         var left = new PointF(up.X + r, up.Y + r);
 
                         Board[i + BoardSize * k][j] =
-                            new Cell(new RectangleF(x, y, _dt, _dt), new[] {left, up, right, down});
+                            new Cell(new RectangleF(x, y, _dt, _dt), new[] { left, up, right, down });
                     }
                 }
             }
@@ -138,7 +137,7 @@ namespace ShipWars
 
             // If there is a ship on the cell.
             public bool Cratif;
-            
+
             // If the cell is destroyed
             public bool Destroyed;
 
@@ -154,14 +153,14 @@ namespace ShipWars
 
             public bool MouseOver()
             {
-                return _path.IsVisible(ShipWarsForm._MouseCords);
+                return _path.IsVisible(ShipWarsForm.MouseCords);
             }
 
             public void MouseClick(MouseEventArgs e)
             {
                 if (e.Button != MouseButtons.Left) return;
                 Destroyed = true;
-                Color = Brushes.Red;
+                Color = (Cratif) ? Brushes.DarkRed : Brushes.DeepSkyBlue;
             }
         }
     }

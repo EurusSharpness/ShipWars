@@ -7,9 +7,9 @@ namespace ShipWars
 {
     public partial class ShipWarsForm : Form
     {
-        public static Size _ClientSize;
-        public static Control.ControlCollection _Collection;
-        public static Point _MouseCords;
+        public static Size CanvasSize;
+        public static Control.ControlCollection Collection;
+        public static Point MouseCords;
         private MainClass _mainClass;
 
         public ShipWarsForm()
@@ -24,8 +24,8 @@ namespace ShipWars
             Name = "Main";
             Activate();
             ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width * 0.8), (int)(Screen.PrimaryScreen.WorkingArea.Height * 0.8));
-            _Collection = Controls;
-            _ClientSize = ClientSize;
+            Collection = Controls;
+            CanvasSize = ClientSize;
             _mainClass = new MainClass();
 
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -39,15 +39,15 @@ namespace ShipWars
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
-            _ClientSize = ClientSize;
+            CanvasSize = ClientSize;
             _mainClass.Draw(e.Graphics);
-            e.Graphics.DrawString($"X: {_MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
+            //e.Graphics.DrawString($"X: {MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
         }
 
         private void Invalidator_Tick(object sender, EventArgs e)
         {
             // (_MouseCords.X, _MouseCords.Y) = (-Location.X + Cursor.Position.X - 10, -Location.Y + Cursor.Position.Y - 30);
-            _MouseCords = PointToClient(Cursor.Position);
+            MouseCords = PointToClient(MousePosition);
             Invalidate();
         }
 
@@ -58,6 +58,7 @@ namespace ShipWars
 
         private void ShipWarsForm_KeyDown(object sender, KeyEventArgs e)
         {
+            SuspendLayout();
             if (e.KeyCode == Keys.Escape)
                 if (MessageBox.Show(@"Are you sure you want to exit?", @"Exit", MessageBoxButtons.OKCancel) ==
                  DialogResult.OK)

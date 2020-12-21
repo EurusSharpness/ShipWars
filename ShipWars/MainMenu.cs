@@ -36,46 +36,37 @@ namespace ShipWars
 
         public void Draw(Graphics g)
         {
-            var x = 0;
             switch (Menu)
             {
                 case Menus.Main:
-                    x = 1;
                     DrawMainPage(g);
                     break;
 
                 case Menus.Start:
-                    x = 2;
                     DrawStartPage(g);
                     break;
 
                 case Menus.Help:
-                    x = 3;
                     DrawHelpPage(g);
                     break;
 
                 case Menus.Settings:
-                    x = 4;
                     DrawSettingsPage(g);
                     break;
 
                 case Menus.Game:
-                    x = 5;
                     DrawGamePage(g);
                     break;
 
                 case Menus.Pause:
-                    x = 6;
                     DrawPausePage(g);
                     break;
 
                 case Menus.Win:
-                    x = 7;
                     DrawWinPage(g);
                     break;
 
                 case Menus.Lose:
-                    x = 8;
                     DrawLosePage(g);
                     break;
 
@@ -92,15 +83,15 @@ namespace ShipWars
         {
             // Relocate them to make sure its relocated to the center if the user changed the client size.
 
-            _settings.Location = new Point(GetHalf(ShipWarsForm._ClientSize,
+            _settings.Location = new Point(GetHalf(ShipWarsForm.CanvasSize,
                 TextRenderer.MeasureText(_settings.Text, _settings.Font)));
 
-            _start.Location = new Point((ShipWarsForm._ClientSize.Width - _start.Width) / 2,
-                (ShipWarsForm._ClientSize.Height - _start.Height) / 2 - _settings.Height);
+            _start.Location = new Point((ShipWarsForm.CanvasSize.Width - _start.Width) / 2,
+                (ShipWarsForm.CanvasSize.Height - _start.Height) / 2 - _settings.Height);
 
             _help.Location =
-                new Point((ShipWarsForm._ClientSize.Width - _help.Width) / 2,
-                    (ShipWarsForm._ClientSize.Height - _help.Height) / 2 + _settings.Height);
+                new Point((ShipWarsForm.CanvasSize.Width - _help.Width) / 2,
+                    (ShipWarsForm.CanvasSize.Height - _help.Height) / 2 + _settings.Height);
 
             _help.Visible = true;
             _start.Visible = _settings.Visible = true;
@@ -117,10 +108,10 @@ namespace ShipWars
             };
 
             g.DrawString(Instructions,
-                new Font("", ShipWarsForm._ClientSize.Width * 0.015f),
+                new Font("", ShipWarsForm.CanvasSize.Width * 0.015f),
                 Brushes.Red,
                 new Rectangle(new Point(0, 100),
-                    new Size(ShipWarsForm._ClientSize.Width, ShipWarsForm._ClientSize.Height)),
+                    new Size(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)),
                 format1);
         }
 
@@ -132,11 +123,11 @@ namespace ShipWars
         private void DrawStartPage(Graphics g)
         {
             _vsComp.Location = new Point(
-                (ShipWarsForm._ClientSize.Width - _vsComp.Width) / 2,
-                (ShipWarsForm._ClientSize.Height - _vsComp.Height) / 2 - _vsComp.Height);
+                (ShipWarsForm.CanvasSize.Width - _vsComp.Width) / 2,
+                (ShipWarsForm.CanvasSize.Height - _vsComp.Height) / 2 - _vsComp.Height);
             _vsPlayer.Location = new Point(
-                (ShipWarsForm._ClientSize.Width - _vsPlayer.Width) / 2,
-                (ShipWarsForm._ClientSize.Height - _vsPlayer.Height) / 2 + _vsPlayer.Height);
+                (ShipWarsForm.CanvasSize.Width - _vsPlayer.Width) / 2,
+                (ShipWarsForm.CanvasSize.Height - _vsPlayer.Height) / 2 + _vsPlayer.Height);
 
             _back.Visible = _vsComp.Visible = _vsPlayer.Visible = true;
             _vsComp.Enabled = _back.Enabled = _vsPlayer.Enabled = true;
@@ -191,9 +182,9 @@ namespace ShipWars
 
             // Set location for the buttons
 
-            ShipWarsForm._Collection.Add(_start);
-            ShipWarsForm._Collection.Add(_settings);
-            ShipWarsForm._Collection.Add(_help);
+            ShipWarsForm.Collection.Add(_start);
+            ShipWarsForm.Collection.Add(_settings);
+            ShipWarsForm.Collection.Add(_help);
         }
 
         private void CreateStartPage()
@@ -208,13 +199,12 @@ namespace ShipWars
             };
             _vsPlayer.MouseClick += (sender, args) =>
             {
-                Menu = Menus.Game;
-                Disable();
+                MessageBox.Show(@"Work in progress...", @"NO!");
             };
 
-            ShipWarsForm._Collection.Add(_vsComp);
-            ShipWarsForm._Collection.Add(_vsPlayer);
-            ShipWarsForm._Collection.Add(_back);
+            ShipWarsForm.Collection.Add(_vsComp);
+            ShipWarsForm.Collection.Add(_vsPlayer);
+            ShipWarsForm.Collection.Add(_back);
         }
 
         private void CreateHelpPage()
@@ -288,7 +278,7 @@ namespace ShipWars
             var b = new Button
             {
                 Text = text,
-                Font = new Font("ALGERIAN", ShipWarsForm._ClientSize.Height / 20f, FontStyle.Italic | FontStyle.Bold),
+                Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 20f, FontStyle.Italic | FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.Transparent,
                 ForeColor = Color.Blue,
