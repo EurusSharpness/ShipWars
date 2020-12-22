@@ -23,8 +23,8 @@ namespace ShipWars
         private bool _isReady;
         private string _message;
         private int _alpha = 255;
-        private bool _messageFlag;
-        private bool _playing; // true => player, false => enemy
+        private bool _messageFlag; 
+        private bool _playing;
 
         public bool PlayAgain;
         public bool BackToMainMenu;
@@ -39,7 +39,9 @@ namespace ShipWars
             IsReady();
         }
 
-
+        /// <summary>
+        /// Create the "Generate Random Fleet" and "Start" Buttons and add functionality to them
+        /// </summary>
         private void IsReady()
         {
             var randomButton = new Button()
@@ -65,7 +67,7 @@ namespace ShipWars
             randomButton.Size = TextRenderer.MeasureText(randomButton.Text, randomButton.Font);
             randomButton.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - randomButton.Width) / 2,
-                (int)(ShipWarsForm.CanvasSize.Height * 0.80f)
+                (int) (ShipWarsForm.CanvasSize.Height * 0.80f)
             );
             ShipWarsForm.Collection.Add(randomButton);
 
@@ -111,24 +113,25 @@ namespace ShipWars
             };
             b.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - b.Width) / 2,
-                (int)(ShipWarsForm.CanvasSize.Height * 0.87f)
+                (int) (ShipWarsForm.CanvasSize.Height * 0.87f)
             );
             ShipWarsForm.Collection.Add(b);
             Form.ActiveForm?.Focus();
         }
 
+        /// <summary>
+        /// Add the player and enemy ships to the game board.
+        /// </summary>
         private void ShipsToBoard()
         {
             foreach (var ship in _enemy.BattleShips)
             {
                 foreach (var cell in ship.IndexPoints.Select(index => _gameBoard.Board[index.Y][index.X]))
                 {
+                    // Shall not see the Enemy ships.
                     cell.Color = new SolidBrush(Color.Transparent);
-                    cell.Cratif = true;
+                    cell.ShipOverMe = true;
                 }
-
-                ship.Visible = false;
-                ship.Enabled = false;
                 ship.Dispose();
             }
 
@@ -138,11 +141,8 @@ namespace ShipWars
                     _gameBoard.Board[index.Y + GameBoard.BoardSize][index.X]))
                 {
                     cell.Color = new SolidBrush(ship.BackColor);
-                    cell.Cratif = true;
+                    cell.ShipOverMe = true;
                 }
-
-                ship.Visible = false;
-                ship.Enabled = false;
                 ship.Dispose();
             }
 
@@ -151,8 +151,8 @@ namespace ShipWars
 
         public void MouseMove(MouseEventArgs e)
         {
-            if (_isReady)
-                _gameBoard.MouseMove(e);
+            if (!_isReady) return;
+            _gameBoard.MouseMove(e);
         }
 
         public void MouseUp(MouseEventArgs e)
@@ -163,11 +163,17 @@ namespace ShipWars
 
         #region POTAT
 
+        /// <summary>
+        /// Check if the clicked cell is in board and not destroyed.
+        /// If the Cell had a ship over it then reduce the other player by 1.
+        /// If the other player HitPoints reached 0 then start
+        /// <seealso cref="GameOver"/>.
+        /// </summary>
         public void MouseDown(MouseEventArgs e)
         {
-            if (!_isReady || _gameBoard._selectedCell.X == -1 || !_playing) return;
-            var selectedCell = _gameBoard.Board[_gameBoard._selectedCell.X][_gameBoard._selectedCell.Y];
-            if (_gameBoard._selectedCell.X >= GameBoard.BoardSize)
+            if (!_isReady || _gameBoard.SelectedCell.X == -1 || !_playing) return;
+            var selectedCell = _gameBoard.Board[_gameBoard.SelectedCell.X][_gameBoard.SelectedCell.Y];
+            if (_gameBoard.SelectedCell.X >= GameBoard.BoardSize)
             {
                 _messageFlag = true;
                 _alpha = 255;
@@ -184,28 +190,36 @@ namespace ShipWars
             }
 
             _gameBoard.MouseDown(e);
-            if (selectedCell.Cratif)
+            if (selectedCell.ShipOverMe)
                 _enemy.HealthPoints--;
             if (_enemy.HealthPoints == 0) GameOver();
             EnemyDoStuff(e);
         }
-
+        
+        /// <summary>
+        /// Enemy chooses a random cell on the board and click it if it was click-able.
+        /// </summary>
         private void EnemyDoStuff(MouseEventArgs e)
         {
             if (!_playing) return;
             var r = new Random();
-        REPEAT:
+            REPEAT: // Choose another cell.
             var col = r.Next(0, GameBoard.BoardSize);
             var row = r.Next(0, GameBoard.BoardSize);
             var selectedCell = _gameBoard.Board[row + GameBoard.BoardSize][col];
             if (selectedCell.Destroyed)
                 goto REPEAT;
             selectedCell.MouseClick(e);
-            if (!selectedCell.Cratif) return;
+            if (!selectedCell.ShipOverMe) return;
             _player.HealthPoints--;
             if (_player.HealthPoints == 0) GameOver();
         }
 
+        /// <summary>
+        /// Open a dialog and wait for the player to choose,
+        /// <para>Yes: Start from setting the ships.</para>
+        /// No: Go back to main menu.
+        /// </summary>
         private void GameOver()
         {
             _alpha = 255;
@@ -213,15 +227,8 @@ namespace ShipWars
             _message = (_player.HealthPoints == 0) ? Messages.YouLost : Messages.YouWon;
             _playing = false;
             var result = MessageBox.Show(@"Care for a rematch mate?", @"Restart", MessageBoxButtons.YesNo);
-            switch (result)
-            {
-                case DialogResult.Yes:
-                    PlayAgain = true;
-                    break;
-                case DialogResult.No:
-                    BackToMainMenu = true;
-                    break;
-            }
+            PlayAgain = result == DialogResult.Yes;
+            BackToMainMenu = !PlayAgain;
         }
 
         #endregion
@@ -238,7 +245,8 @@ namespace ShipWars
 
             _gameBoard.Draw(g);
             var font = new Font(FontFamily.GenericMonospace, 28, FontStyle.Bold);
-            g.DrawString(@"Player Health: " + _player.HealthPoints + "\n\nEnemy Health: " + _enemy.HealthPoints, font, Brushes.DarkTurquoise, new PointF(0,100));
+            g.DrawString(@"Player Health: " + _player.HealthPoints + "\n\nEnemy Health: " + _enemy.HealthPoints, font,
+                Brushes.DarkTurquoise, new PointF(0, 100));
             DrawGameOver(g);
         }
 

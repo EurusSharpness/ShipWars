@@ -9,37 +9,45 @@ namespace ShipWars
     {
         private readonly Matrix _matrix;
 
-        private readonly float _dt;
+        
+        private readonly float _cellSize;
         public const int BoardSize = 14;
         private const int Angle = 45;
-
+        private readonly float _dx;
+        private readonly float _dy;
         public Cell[][] Board;
-        public Point _selectedCell;
-
-        public bool IsReady;
-
+        public Point SelectedCell;
 
         public GameBoard()
         {
             _matrix = new Matrix();
-            _dt = Math.Min(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) * 0.028f;
-            _selectedCell = new Point(-1, -1);
+            _cellSize = Math.Min(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) * 0.029f;
+            SelectedCell = new Point(-1, -1);
+            _dy = _cellSize * (BoardSize + 2);
+            _dx = ShipWarsForm.CanvasSize.Width * 0.5f;
             CreateBoard();
         }
 
         public void MouseMove(MouseEventArgs e)
         {
+            // if in border bounds.
+            // 0 Top corner, 1 right corer, 2 bottom corner, 3 left corner.
+            if (ShipWarsForm.MouseCords.Y < Board[0][BoardSize - 1].Path.PathPoints[0].Y || 
+                ShipWarsForm.MouseCords.X < Board[0][0].Path.PathPoints[3].X ||
+                ShipWarsForm.MouseCords.Y > Board[2 * BoardSize - 1][0].Path.PathPoints[2].Y ||
+                ShipWarsForm.MouseCords.X > Board[2 * BoardSize - 1][BoardSize - 1].Path.PathPoints[1].X)
+                return;
             for (var i = 0; i < Board.Length; i++)
             {
                 for (var j = 0; j < Board[i].Length; j++)
                 {
                     if (!Board[i][j].MouseOver()) continue;
-                    (_selectedCell.X, _selectedCell.Y) = (i, j);
+                    (SelectedCell.X, SelectedCell.Y) = (i, j);
                     return;
                 }
             }
 
-            (_selectedCell.X, _selectedCell.Y) = (-1, -1);
+            (SelectedCell.X, SelectedCell.Y) = (-1, -1);
         }
 
         public void MouseUp(MouseEventArgs e)
@@ -49,8 +57,8 @@ namespace ShipWars
 
         public void MouseDown(MouseEventArgs e)
         {
-            if (_selectedCell.X == -1) return;
-            Board[_selectedCell.X][_selectedCell.Y].MouseClick(e);
+            if (SelectedCell.X == -1) return;
+            Board[SelectedCell.X][SelectedCell.Y].MouseClick(e);
         }
 
         public void Draw(Graphics g)
@@ -60,13 +68,17 @@ namespace ShipWars
 
         private void DrawGameBoard(Graphics g) => RotateRectangles(g);
 
-
+        /// <summary>
+        /// Rotate the board by 45°.
+        /// The rotation is from the Top-Left square and tilt it 45° Clock-wise.
+        /// </summary>
         private void RotateRectangles(Graphics g)
         {
             g.Transform = _matrix;
-
-            if (_selectedCell.X != -1)
-                g.FillRectangle(Brushes.Gold, Board[_selectedCell.X][_selectedCell.Y].Rect);
+            
+            // Draw the little golden square.
+            if (SelectedCell.X != -1)
+                g.FillRectangle(Brushes.Gold, Board[SelectedCell.X][SelectedCell.Y].Rect);
 
             foreach (var rect in Board)
             {
@@ -78,7 +90,7 @@ namespace ShipWars
                         t.Rect.Width, t.Rect.Height);
                 }
             }
-
+            // return drawings to normal.
             g.ResetTransform();
         }
 
@@ -86,16 +98,15 @@ namespace ShipWars
         {
             Board = new Cell[BoardSize * 2][]; // Create 2 boards for each player, 14x14 each one.
 
-            var dx = ShipWarsForm.CanvasSize.Width * 0.5f;
-            var dy = _dt * (BoardSize + 2);
-
+            var tempDx = _dx;
+            var tempDy = _dy;
             // C^2 = A^2 + B^2 --> C^2 = (dt/2)^2 + (dt/2)^2 --> C = dt / Sqrt(2)
             // Half the radius of the circle around the square that is generated from rotation.
-            var r = _dt / (float)Math.Sqrt(2);
+            var r = _cellSize / (float)Math.Sqrt(2);
 
             // this point is the Top point of the top left square after rotation
             // X = Center horizontally, Y = Center vertically - r ==> the top point of the square.
-            var origin = new PointF(dx + _dt / 2, dy - ((BoardSize - 1) - 0.5f) * _dt - r);
+            var origin = new PointF(_dx + _cellSize / 2, _dy - ((BoardSize - 1) - 0.5f) * _cellSize - r);
 
             ////////////////UP///////////////////
             ////////////O///^//O////////////////
@@ -104,13 +115,13 @@ namespace ShipWars
             /////////////Down////////////////
             for (var k = 0; k < 2; k++)
             {
-                dx += (BoardSize + 1) * _dt * k;
+                tempDx += (BoardSize + 1) * _cellSize * k;
                 for (var i = 0; i < BoardSize; i++)
                 {
                     Board[i + 14 * k] = new Cell[BoardSize];
                     for (var j = BoardSize - 1; j >= 0; j--)
                     {
-                        var (x, y) = (dx + _dt * i, dy - j * _dt);
+                        var (x, y) = (tempDx + _cellSize * i, _dy - j * _cellSize);
 
                         // Enough to calculate 1 point of the 4, the rest we just add/subtract 'r'. 
                         var up = new PointF(origin.X + r * (i - BoardSize + 1 + j + (BoardSize + 1) * k),
@@ -120,11 +131,12 @@ namespace ShipWars
                         var left = new PointF(up.X + r, up.Y + r);
 
                         Board[i + BoardSize * k][j] =
-                            new Cell(new RectangleF(x, y, _dt, _dt), new[] { left, up, right, down });
+                            new Cell(new RectangleF(x, y, _cellSize, _cellSize), new[] { left, up, right, down });
                     }
                 }
             }
 
+            // Set the matrix rotation° and starting X,Y.
             _matrix.RotateAt(Angle,
                 new PointF(
                     Board[0][BoardSize - 1].Rect.Left + (Board[BoardSize - 1][BoardSize - 1].Rect.Width / 2),
@@ -133,34 +145,38 @@ namespace ShipWars
 
         public class Cell
         {
+            /// <summary>Rectangle that represents the cell.</summary>
             public readonly RectangleF Rect;
+            
+            /// <summary>If there is a ship on the cell.</summary>
+            public bool ShipOverMe;
 
-            // If there is a ship on the cell.
-            public bool Cratif;
-
-            // If the cell is destroyed
+            /// <summary>If the cell is destroyed.</summary>
             public bool Destroyed;
 
-            // Left, Up, Right, Down.
-            private readonly GraphicsPath _path;
+            /// <summary>The path between the 4 corners of the cell.</summary>
+            public readonly GraphicsPath Path;
+            /// <summary>Cell back color.</summary>
             public Brush Color = Brushes.Transparent;
             public Cell(RectangleF rectangleF, PointF[] cords)
             {
                 (Rect, Destroyed) = (rectangleF, false);
-                _path = new GraphicsPath();
-                _path.AddPolygon(cords);
+                Path = new GraphicsPath();
+                Path.AddPolygon(cords);
             }
 
+            /// <returns>True if the mouse is over the cell, false otherwise</returns>
             public bool MouseOver()
             {
-                return _path.IsVisible(ShipWarsForm.MouseCords);
+                return Path.IsVisible(ShipWarsForm.MouseCords);
             }
-
+            
+            /// <summary>Destroy the cell and check if it had a ship over it</summary>
             public void MouseClick(MouseEventArgs e)
             {
                 if (e.Button != MouseButtons.Left) return;
                 Destroyed = true;
-                Color = (Cratif) ? Brushes.DarkRed : Brushes.DeepSkyBlue;
+                Color = (ShipOverMe) ? Brushes.DarkRed : Brushes.DeepSkyBlue;
             }
         }
     }

@@ -3,6 +3,9 @@ using System.Drawing.Imaging;
 
 namespace ShipWars
 {
+    /// <summary>
+    /// Create a moving background.
+    /// </summary>
     internal class GameBackground
     {
         private float _x;
@@ -12,6 +15,9 @@ namespace ShipWars
             CreateBackground();
         }
 
+        /// <summary>
+        /// Create an image (2 x Screen_Width, Screen_Height)
+        /// </summary>
         private void CreateBackground()
         {
             _background = new Bitmap(ShipWarsForm.CanvasSize.Width * 2, ShipWarsForm.CanvasSize.Height,
@@ -43,7 +49,6 @@ namespace ShipWars
         {
             _x = (_x < ShipWarsForm.CanvasSize.Width) ? _x + 1.5f : 0;
             g.DrawImage(_background, _x - ShipWarsForm.CanvasSize.Width, 0);
-
         }
     }
 }
