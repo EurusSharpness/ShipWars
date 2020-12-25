@@ -58,18 +58,6 @@ namespace ShipWars
                     DrawGamePage(g);
                     break;
 
-                case Menus.Pause:
-                    DrawPausePage(g);
-                    break;
-
-                case Menus.Win:
-                    DrawWinPage(g);
-                    break;
-
-                case Menus.Lose:
-                    DrawLosePage(g);
-                    break;
-
                 default:
                     throw new IndexOutOfRangeException();
             }
@@ -138,21 +126,6 @@ namespace ShipWars
             _back.Visible = _back.Enabled = true;
         }
 
-        private void DrawPausePage(Graphics g)
-        {
-            _back.Visible = _back.Enabled = true;
-        }
-
-        private void DrawWinPage(Graphics g)
-        {
-            _back.Visible = _back.Enabled = true;
-        }
-
-        private void DrawLosePage(Graphics g)
-        {
-            _back.Visible = _back.Enabled = true;
-        }
-
         #endregion DrawPages
 
         #region CreateButtons
@@ -215,22 +188,6 @@ namespace ShipWars
         {
         }
 
-        private void CreateGamePage()
-        {
-        }
-
-        private void CreateWinPage()
-        {
-        }
-
-        private void CreateLosePage()
-        {
-        }
-
-        private void CreatePausePage()
-        {
-        }
-
         private void CreateButtons()
         {
             CreateBackButton();
@@ -238,10 +195,6 @@ namespace ShipWars
             CreateStartPage();
             CreateSettingsPage();
             CreateHelpPage();
-            CreateGamePage();
-            CreateWinPage();
-            CreateLosePage();
-            CreatePausePage();
         }
 
         private void CreateBackButton()

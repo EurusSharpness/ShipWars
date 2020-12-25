@@ -30,29 +30,10 @@ namespace ShipWars
 
         public void MouseMove(MouseEventArgs e)
         {
-            // if in border bounds.
-            // 0 Top corner, 1 right corer, 2 bottom corner, 3 left corner.
-            if (ShipWarsForm.MouseCords.Y < Board[0][BoardSize - 1].Path.PathPoints[0].Y || 
-                ShipWarsForm.MouseCords.X < Board[0][0].Path.PathPoints[3].X ||
-                ShipWarsForm.MouseCords.Y > Board[2 * BoardSize - 1][0].Path.PathPoints[2].Y ||
-                ShipWarsForm.MouseCords.X > Board[2 * BoardSize - 1][BoardSize - 1].Path.PathPoints[1].X)
-                return;
-            for (var i = 0; i < Board.Length; i++)
-            {
-                for (var j = 0; j < Board[i].Length; j++)
-                {
-                    if (!Board[i][j].MouseOver()) continue;
-                    (SelectedCell.X, SelectedCell.Y) = (i, j);
-                    return;
-                }
-            }
-
-            (SelectedCell.X, SelectedCell.Y) = (-1, -1);
         }
 
         public void MouseUp(MouseEventArgs e)
         {
-
         }
 
         public void MouseDown(MouseEventArgs e)
@@ -77,19 +58,32 @@ namespace ShipWars
             g.Transform = _matrix;
             
             // Draw the little golden square.
-            if (SelectedCell.X != -1)
-                g.FillRectangle(Brushes.Gold, Board[SelectedCell.X][SelectedCell.Y].Rect);
-
+            /*if (SelectedCell.X != -1)
+                g.FillRectangle(Brushes.Gold, Board[SelectedCell.X][SelectedCell.Y].Rect);*/
+            var i = 0;
+            var flag = false;
             foreach (var rect in Board)
             {
+                var j = 0;
                 foreach (var t in rect)
                 {
-                    g.FillRectangle(t.Color, t.Rect.X, t.Rect.Y,
-                            t.Rect.Width, t.Rect.Height);
+                    if (t.MouseOver())
+                    {
+                        SelectedCell.X = i;
+                        SelectedCell.Y = j;
+                        g.FillRectangle(Brushes.Gold, t.Rect);
+                        flag = true;
+                    }
+                    g.FillRectangle(t.Color, t.Rect);
                     g.DrawRectangle(new Pen(Brushes.Black, 2.5f), t.Rect.X, t.Rect.Y,
                         t.Rect.Width, t.Rect.Height);
+                    j++;
                 }
+                i++;
             }
+
+            if (!flag)
+                (SelectedCell.X, SelectedCell.Y) = (-1, -1); // Cell not selected
             // return drawings to normal.
             g.ResetTransform();
         }
