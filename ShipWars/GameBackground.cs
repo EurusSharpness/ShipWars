@@ -6,7 +6,7 @@ namespace ShipWars
     /// <summary>
     /// Create a moving background.
     /// </summary>
-    internal class GameBackground
+    public class GameBackground
     {
         private float _x;
         private Bitmap _background;

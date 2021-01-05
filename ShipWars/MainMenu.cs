@@ -10,7 +10,8 @@ namespace ShipWars
         Start,
         Help,
         Settings,
-        Game,
+        GameOffline,
+        GameOnline,
         Win,
         Lose,
         Pause
@@ -54,7 +55,7 @@ namespace ShipWars
                     DrawSettingsPage(g);
                     break;
 
-                case Menus.Game:
+                case Menus.GameOffline:
                     DrawGamePage(g);
                     break;
 
@@ -167,7 +168,7 @@ namespace ShipWars
 
             _vsComp.MouseClick += (sender, args) =>
             {
-                Menu = Menus.Game;
+                Menu = Menus.GameOffline;
                 Disable();
             };
             _vsPlayer.MouseClick += (sender, args) =>
@@ -203,7 +204,7 @@ namespace ShipWars
             _back.MouseClick += (sender, args) =>
             {
                 Disable();
-                if (Menu == Menus.Game)
+                if (Menu == Menus.GameOffline || Menu == Menus.GameOnline)
                 {
                     var r = MessageBox.Show("Are you sure you want to exit?", "Exit", MessageBoxButtons.YesNo);
                     if (r != DialogResult.Yes) return;

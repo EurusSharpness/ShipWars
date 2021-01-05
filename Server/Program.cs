@@ -70,7 +70,6 @@ namespace Server
 
             private void HandlePlayer(object obj)
             {
-
                 try
                 {
                     var player = (Player) obj;
@@ -101,8 +100,13 @@ namespace Server
                     }
                     while (true)
                     {
-                        if (_playersReady != 2) continue;
                         receive = player.Read();
+                        if (_playersReady != 2)
+                        {
+                            send = new Message {Code = Codes.WaitingForPlayer};
+                            player.Write(send);
+                            continue;
+                        }
                         if (receive.Code == Codes.CellClicked)
                         {
                             if (_playerTurn == player.PlayerId)

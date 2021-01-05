@@ -17,11 +17,11 @@ namespace ShipWars
         public void Draw(Graphics g)
         {
 
-            if (MainMenu.Menu == Menus.Game)
+            if (MainMenu.Menu == Menus.GameOffline)
             {
-                Game ??= new Game();
+                Game ??= new OfflineGame();
                 if (Game.PlayAgain)
-                    Game = new Game();
+                    Game = new OfflineGame();
                 if (Game.BackToMainMenu)
                 {
                     Game = null;
@@ -35,19 +35,19 @@ namespace ShipWars
 
         public void MouseMove(MouseEventArgs e)
         {
-            if (MainMenu.Menu == Menus.Game)
+            if (MainMenu.Menu == Menus.GameOffline || MainMenu.Menu == Menus.GameOnline)
                 Game?.MouseMove(e);
         }
 
         public void MouseUp(MouseEventArgs e)
         {
-            if (MainMenu.Menu == Menus.Game)
+            if (MainMenu.Menu == Menus.GameOffline || MainMenu.Menu == Menus.GameOnline)
                 Game?.MouseUp(e);
         }
 
         public void MouseDown(MouseEventArgs e)
         {
-            if (MainMenu.Menu == Menus.Game)
+            if (MainMenu.Menu == Menus.GameOffline || MainMenu.Menu == Menus.GameOnline)
                 Game?.MouseDown(e);
         }
     }

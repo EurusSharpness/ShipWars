@@ -15,16 +15,16 @@ namespace ShipWars
         public static string YouLost => @"You Lost the game BOOOOOOOOOOOOOOOO!!!";
     }
 
-    public class Game
+    public abstract class Game
     {
-        private readonly GameBackground _background;
-        private readonly GameBoard _gameBoard;
-        private readonly Player _player, _enemy;
-        private bool _isReady;
-        private string _message;
-        private int _alpha = 255;
-        private bool _messageFlag; 
-        private bool _playing;
+        protected readonly GameBackground _background;
+        protected readonly GameBoard _gameBoard;
+        protected readonly Player _player, _enemy;
+        protected bool _isReady;
+        protected string _message;
+        protected int _alpha = 255;
+        protected bool _messageFlag;
+        protected bool _playing;
 
         public bool PlayAgain;
         public bool BackToMainMenu;
@@ -35,7 +35,6 @@ namespace ShipWars
             _gameBoard = new GameBoard();
             _player = new Player(true);
             _enemy = new Player(false);
-            _enemy.GenerateRandomFleet();
             IsReady();
         }
 
@@ -44,33 +43,6 @@ namespace ShipWars
         /// </summary>
         private void IsReady()
         {
-            var randomButton = new Button()
-            {
-                Name = @"RandomButton",
-                Text = @"Generate Random Fleet",
-                AutoSize = true,
-                Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 24f, FontStyle.Italic | FontStyle.Bold),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Transparent,
-                FlatAppearance =
-                    {BorderSize = 0},
-            };
-            randomButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
-            randomButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            randomButton.MouseEnter += (sender, args) => randomButton.ForeColor = Color.Aquamarine;
-            randomButton.MouseLeave += (sender, args) => randomButton.ForeColor = Color.Black;
-            randomButton.MouseClick += (sender, args) => _player.GenerateRandomFleet();
-            randomButton.MouseUp += (sender, args) =>
-            {
-                if (Form.ActiveForm != null) Form.ActiveForm.ActiveControl = null;
-            };
-            randomButton.Size = TextRenderer.MeasureText(randomButton.Text, randomButton.Font);
-            randomButton.Location = new Point(
-                (ShipWarsForm.CanvasSize.Width - randomButton.Width) / 2,
-                (int) (ShipWarsForm.CanvasSize.Height * 0.80f)
-            );
-            ShipWarsForm.Collection.Add(randomButton);
-
             var b = new Button()
             {
                 Text = @"S T A R T",
@@ -84,7 +56,7 @@ namespace ShipWars
             b.Size = TextRenderer.MeasureText(b.Text, b.Font);
             b.FlatAppearance.BorderSize = 0;
             b.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            b.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            b.FlatAppearance.MouseDownBackColor = Color.FromArgb(50, Color.LightGray);
             b.MouseEnter += (s, e) => { b.ForeColor = Color.Red; };
             b.MouseLeave += (s, e) => { b.ForeColor = Color.Blue; };
             b.MouseClick += (s, e) =>
@@ -101,8 +73,7 @@ namespace ShipWars
                     _playing = true;
                     b.Enabled = false;
                     b.Visible = false;
-                    randomButton.Visible = randomButton.Enabled = false;
-                    randomButton.Dispose();
+                    ShipWarsForm.Collection.RemoveByKey("RandomButton");
                     ShipsToBoard();
                     b.Dispose();
                 }
@@ -132,6 +103,7 @@ namespace ShipWars
                     cell.Color = new SolidBrush(Color.Transparent);
                     cell.ShipOverMe = true;
                 }
+
                 ship.Dispose();
             }
 
@@ -169,58 +141,16 @@ namespace ShipWars
         /// If the other player HitPoints reached 0 then start
         /// <seealso cref="GameOver"/>.
         /// </summary>
-        public void MouseDown(MouseEventArgs e)
-        {
-            if (!_isReady || _gameBoard.SelectedCell.X == -1 || !_playing) return;
-            var selectedCell = _gameBoard.Board[_gameBoard.SelectedCell.X][_gameBoard.SelectedCell.Y];
-            if (_gameBoard.SelectedCell.X >= GameBoard.BoardSize)
-            {
-                _messageFlag = true;
-                _alpha = 255;
-                _message = Messages.SelectFromEnemy;
-                return;
-            }
+        public abstract void MouseDown(MouseEventArgs e);
 
-            if (selectedCell.Destroyed)
-            {
-                _messageFlag = true;
-                _alpha = 255;
-                _message = Messages.CellAlreadyDestroyed;
-                return;
-            }
-
-            _gameBoard.MouseDown(e);
-            if (selectedCell.ShipOverMe)
-                _enemy.HealthPoints--;
-            if (_enemy.HealthPoints == 0) GameOver();
-            EnemyDoStuff(e);
-        }
-        
-        /// <summary>
-        /// Enemy chooses a random cell on the board and click it if it was click-able.
-        /// </summary>
-        private void EnemyDoStuff(MouseEventArgs e)
-        {
-            if (!_playing) return;
-            var r = new Random();
-            REPEAT: // Choose another cell.
-            var col = r.Next(0, GameBoard.BoardSize);
-            var row = r.Next(0, GameBoard.BoardSize);
-            var selectedCell = _gameBoard.Board[row + GameBoard.BoardSize][col];
-            if (selectedCell.Destroyed)
-                goto REPEAT;
-            selectedCell.MouseClick(e);
-            if (!selectedCell.ShipOverMe) return;
-            _player.HealthPoints--;
-            if (_player.HealthPoints == 0) GameOver();
-        }
+       
 
         /// <summary>
         /// Open a dialog and wait for the player to choose,
         /// <para>Yes: Start from setting the ships.</para>
         /// No: Go back to main menu.
         /// </summary>
-        private void GameOver()
+        protected void GameOver()
         {
             _alpha = 255;
             _messageFlag = true;
@@ -250,7 +180,7 @@ namespace ShipWars
             DrawGameOver(g);
         }
 
-        private void DrawGameOver(Graphics g)
+        protected void DrawGameOver(Graphics g)
         {
             if (_playing) return;
 
@@ -267,7 +197,7 @@ namespace ShipWars
                     (ShipWarsForm.CanvasSize.Width - g.MeasureString(_message, font).Width) / 2, 50));
         }
 
-        private void DrawMessage(Graphics g)
+        protected void DrawMessage(Graphics g)
         {
             if (!_messageFlag) return;
             var font = new Font(FontFamily.GenericMonospace, 28, FontStyle.Bold);

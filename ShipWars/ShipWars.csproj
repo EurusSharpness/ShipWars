@@ -48,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OfflineGame.cs" />
+    <Compile Include="OnlineGame.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="GameBackground.cs" />
     <Compile Include="GameBoard.cs" />
