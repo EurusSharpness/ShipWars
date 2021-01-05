@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ContentModelStore">
-    <e p="C:\Users\samh8\.Rider2019.2\config\scratches" t="IncludeRecursive" />
-    <e p="C:\Users\samh8\.Rider2019.2\system\extResources" t="IncludeRecursive" />
-    <e p="C:\Users\samh8\.Rider2019.2\system\resharper-host\local\Transient\ReSharperHost\v192\SolutionCaches\_.19.00" t="ExcludeRecursive" />
-    <e p="E:\Rider_Solution\ShipWars\Server" t="IncludeRecursive">
+    <e p="C:\Users\samh8\AppData\local\Jetbrains\Rider2020.3\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\samh8\AppData\local\Jetbrains\Rider2020.3\resharper-host\local\Transient\Rider\v203\SolutionCaches\_.19.00" t="ExcludeRecursive" />
+    <e p="C:\Users\samh8\AppData\Roaming\Jetbrains\Rider2020.3\scratches" t="IncludeRecursive" />
+    <e p="E:\Jetbrains\Rider_Solutions\ShipWars\Server" t="IncludeRecursive">
       <e p="App.config" t="Include" />
       <e p="bin" t="ExcludeRecursive" />
       <e p="Message.cs" t="Include" />
