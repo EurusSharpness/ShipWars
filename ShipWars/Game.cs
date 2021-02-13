@@ -17,9 +17,10 @@ namespace ShipWars
 
     public abstract class Game
     {
-        protected readonly GameBackground _background;
-        protected readonly GameBoard _gameBoard;
-        protected readonly Player _player, _enemy;
+        protected GameBackground _background;
+        protected GameBoard _gameBoard;
+        protected Player _player;
+        protected Player _enemy;
         protected bool _isReady;
         protected string _message;
         protected int _alpha = 255;
@@ -28,22 +29,18 @@ namespace ShipWars
 
         public bool PlayAgain;
         public bool BackToMainMenu;
-
+        protected Button StartButton;
         public Game()
         {
-            _background = new GameBackground();
-            _gameBoard = new GameBoard();
-            _player = new Player(true);
-            _enemy = new Player(false);
-            IsReady();
+            
         }
 
         /// <summary>
         /// Create the "Generate Random Fleet" and "Start" Buttons and add functionality to them
         /// </summary>
-        private void IsReady()
+        protected void IsReady()
         {
-            var b = new Button()
+            StartButton = new Button()
             {
                 Text = @"S T A R T",
                 Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 24f, FontStyle.Italic | FontStyle.Bold),
@@ -53,47 +50,29 @@ namespace ShipWars
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
-            b.Size = TextRenderer.MeasureText(b.Text, b.Font);
-            b.FlatAppearance.BorderSize = 0;
-            b.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            b.FlatAppearance.MouseDownBackColor = Color.FromArgb(50, Color.LightGray);
-            b.MouseEnter += (s, e) => { b.ForeColor = Color.Red; };
-            b.MouseLeave += (s, e) => { b.ForeColor = Color.Blue; };
-            b.MouseClick += (s, e) =>
-            {
-                _isReady = _player.IsReady();
-                if (!_isReady)
-                {
-                    _alpha = 255;
-                    _message = Messages.NotReady;
-                    _messageFlag = true;
-                }
-                else
-                {
-                    _playing = true;
-                    b.Enabled = false;
-                    b.Visible = false;
-                    ShipWarsForm.Collection.RemoveByKey("RandomButton");
-                    ShipsToBoard();
-                    b.Dispose();
-                }
-            };
-            b.MouseUp += (ppp, eee) =>
+            StartButton.Size = TextRenderer.MeasureText(StartButton.Text, StartButton.Font);
+            StartButton.FlatAppearance.BorderSize = 0;
+            StartButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
+            StartButton.FlatAppearance.MouseDownBackColor = Color.FromArgb(50, Color.LightGray);
+            StartButton.MouseEnter += (s, e) => { StartButton.ForeColor = Color.Red; };
+            StartButton.MouseLeave += (s, e) => { StartButton.ForeColor = Color.Blue; };
+            
+            StartButton.MouseUp += (ppp, eee) =>
             {
                 if (Form.ActiveForm != null) Form.ActiveForm.ActiveControl = null;
             };
-            b.Location = new Point(
-                (ShipWarsForm.CanvasSize.Width - b.Width) / 2,
+            StartButton.Location = new Point(
+                (ShipWarsForm.CanvasSize.Width - StartButton.Width) / 2,
                 (int) (ShipWarsForm.CanvasSize.Height * 0.87f)
             );
-            ShipWarsForm.Collection.Add(b);
+            ShipWarsForm.Collection.Add(StartButton);
             Form.ActiveForm?.Focus();
         }
 
         /// <summary>
         /// Add the player and enemy ships to the game board.
         /// </summary>
-        private void ShipsToBoard()
+        protected virtual void ShipsToBoard()
         {
             foreach (var ship in _enemy.BattleShips)
             {
@@ -115,6 +94,7 @@ namespace ShipWars
                     cell.Color = new SolidBrush(ship.BackColor);
                     cell.ShipOverMe = true;
                 }
+
                 ship.Dispose();
             }
 
@@ -133,7 +113,6 @@ namespace ShipWars
             _gameBoard.MouseUp(e);
         }
 
-        #region POTAT
 
         /// <summary>
         /// Check if the clicked cell is in board and not destroyed.
@@ -143,7 +122,6 @@ namespace ShipWars
         /// </summary>
         public abstract void MouseDown(MouseEventArgs e);
 
-       
 
         /// <summary>
         /// Open a dialog and wait for the player to choose,
@@ -161,24 +139,7 @@ namespace ShipWars
             BackToMainMenu = !PlayAgain;
         }
 
-        #endregion
-
-        public void Draw(Graphics g)
-        {
-            _background.Draw(g);
-            DrawMessage(g);
-            if (!_isReady)
-            {
-                Player.Draw(g);
-                return;
-            }
-
-            _gameBoard.Draw(g);
-            var font = new Font(FontFamily.GenericMonospace, 28, FontStyle.Bold);
-            g.DrawString(@"Player Health: " + _player.HealthPoints + "\n\nEnemy Health: " + _enemy.HealthPoints, font,
-                Brushes.DarkTurquoise, new PointF(0, 100));
-            DrawGameOver(g);
-        }
+        public abstract void Draw(Graphics g);
 
         protected void DrawGameOver(Graphics g)
         {

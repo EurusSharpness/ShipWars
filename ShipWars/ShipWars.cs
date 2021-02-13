@@ -27,7 +27,7 @@ namespace ShipWars
             Collection = Controls;
             CanvasSize = ClientSize;
             _mainClass = new MainClass();
-
+            ShowInTaskbar = true;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;

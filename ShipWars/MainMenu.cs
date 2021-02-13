@@ -173,7 +173,9 @@ namespace ShipWars
             };
             _vsPlayer.MouseClick += (sender, args) =>
             {
-                MessageBox.Show(@"Work in progress...", @"NO!");
+                Menu = Menus.GameOnline;
+                Disable();
+                // MessageBox.Show(@"Work in progress...", @"NO!");
             };
 
             ShipWarsForm.Collection.Add(_vsComp);

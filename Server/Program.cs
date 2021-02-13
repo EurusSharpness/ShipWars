@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Globalization;
+using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Server
@@ -31,9 +34,9 @@ namespace Server
             _listener.Start();
             Console.WriteLine($@"Server is listening on {IpAddress}@{Port.ToString()}");
             var p1 = _listener.AcceptTcpClient();
-            Console.WriteLine("Player 1 is connected");
+            Console.WriteLine(@"Player 1 is connected");
             var p2 = _listener.AcceptTcpClient();
-            Console.WriteLine("Player 2 is connected");
+            Console.WriteLine(@"Player 2 is connected");
             new Thread(RunGame).Start(new Game(p1, p2));
         }
 
@@ -70,6 +73,7 @@ namespace Server
 
             private void HandlePlayer(object obj)
             {
+             
                 try
                 {
                     var player = (Player) obj;
@@ -96,17 +100,21 @@ namespace Server
                     else
                     {
                         send = new Message {Code = Codes.YouGoSecond};
+                        Console.WriteLine($"This is the line before the game starts");
                         player.Write(send);
                     }
+                    send = new Message {Code = Codes.WaitingForPlayer};
+                    player.Write(send);
+                    while (_playersReady < 2){}
+
+                    send.Code = Codes.StartPlaying;
+                    player.Write(send);
                     while (true)
                     {
                         receive = player.Read();
-                        if (_playersReady != 2)
-                        {
-                            send = new Message {Code = Codes.WaitingForPlayer};
-                            player.Write(send);
+                        if(receive == null)
                             continue;
-                        }
+                        Console.WriteLine(receive.Code);
                         if (receive.Code == Codes.CellClicked)
                         {
                             if (_playerTurn == player.PlayerId)
@@ -123,7 +131,9 @@ namespace Server
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("something went wrong\n"+e.Message);
+                    Console.WriteLine($@"something went wrong
+{e.Message}
+{e.StackTrace}");
                     var send = new Message{Code = Codes.Disconnected};
                     _p1.Write(send);
                     _p2.Write(send);
@@ -187,9 +197,9 @@ namespace Server
                     for (var j = 0; j < BoardSize; j++)
                     {
                         _gameBoard[i + BoardSize * (p.PlayerId - 1)][j].HasShip = message.Matrix[i][j];
-                        Console.Write($"{message.Matrix[i][j].ToString()}, ");
+                        // Console.Write($"{message.Matrix[i][j].ToString()}, ");
                     }
-                    Console.WriteLine();
+                    // Console.WriteLine();
                 }
             }
 
@@ -234,7 +244,7 @@ namespace Server
                     }
                     catch (Exception)
                     {
-                        throw new Exception($"Player {PlayerId.ToString()} Diconnected");
+                        //throw new Exception($"Player {PlayerId.ToString()} Diconnected");
                     }
                 }
                 
@@ -249,7 +259,7 @@ namespace Server
                     }
                     catch (Exception)
                     {
-                        throw new Exception($"Player {PlayerId.ToString()} Diconnected");
+                        return null;
                     }
                 }
             }

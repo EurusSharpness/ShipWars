@@ -26,7 +26,7 @@ namespace ShipWars
         /// <summary> Number of lives the player has, 3+4+4+5+10+6 </summary>
         public int HealthPoints = 32;
 
-        private Button randomFleet;
+        public Button randomFleet;
         /// <summary>
         /// 
         /// </summary>

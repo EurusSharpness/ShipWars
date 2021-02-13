@@ -30,6 +30,19 @@ namespace ShipWars
                 }
                 Game.Draw(g);
             }
+            if (MainMenu.Menu == Menus.GameOnline)
+            {
+                Game ??= new OnlineGame();
+                if (Game.PlayAgain)
+                    Game = new OnlineGame();
+                if (Game.BackToMainMenu)
+                {
+                    Game = null;
+                    MainMenu.Menu = Menus.Main;
+                    return;
+                }
+                Game.Draw(g);
+            }
             else MainMenu.Draw(g);
         }
 

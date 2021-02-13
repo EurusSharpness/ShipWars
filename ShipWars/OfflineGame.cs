@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
 using System;
+using System.Drawing;
 
 namespace ShipWars
 {
@@ -7,7 +8,33 @@ namespace ShipWars
     {
         public OfflineGame()
         {
+            _background = new GameBackground();
+            _gameBoard = new GameBoard();
+            _player = new Player(true);
+            _enemy = new Player(false);
             _enemy.GenerateRandomFleet();
+            
+            StartButton.MouseClick += (s, e) =>
+            {
+                _isReady = _player.IsReady();
+                if (!_isReady)
+                {
+                    _alpha = 255;
+                    _message = Messages.NotReady;
+                    _messageFlag = true;
+                }
+                else
+                {
+                    _playing = true;
+                    StartButton.Enabled = false;
+                    StartButton.Visible = false;
+                    ShipWarsForm.Collection.RemoveByKey("RandomButton");
+                    ShipsToBoard();
+                    StartButton.Dispose();
+                }
+            };
+            
+            IsReady();
         }
         public override void MouseDown(MouseEventArgs e)
         {
@@ -53,6 +80,23 @@ namespace ShipWars
             if (!selectedCell.ShipOverMe) return;
             _player.HealthPoints--;
             if (_player.HealthPoints == 0) GameOver();
+        }
+        
+        public override void Draw(Graphics g)
+        {
+            _background.Draw(g);
+            DrawMessage(g);
+            if (!_isReady)
+            {
+                Player.Draw(g);
+                return;
+            }
+
+            _gameBoard.Draw(g);
+            var font = new Font(FontFamily.GenericMonospace, 28, FontStyle.Bold);
+            g.DrawString(@"Player Health: " + _player.HealthPoints + "\n\nEnemy Health: " + _enemy.HealthPoints, font,
+                Brushes.DarkTurquoise, new PointF(0, 100));
+            DrawGameOver(g);
         }
     }
 }
