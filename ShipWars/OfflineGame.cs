@@ -13,6 +13,8 @@ namespace ShipWars
             _player = new Player(true);
             _enemy = new Player(false);
             _enemy.GenerateRandomFleet();
+
+            IsReady();
             
             StartButton.MouseClick += (s, e) =>
             {
@@ -33,11 +35,10 @@ namespace ShipWars
                     StartButton.Dispose();
                 }
             };
-            
-            IsReady();
         }
         public override void MouseDown(MouseEventArgs e)
         {
+            if(e.Button != MouseButtons.Left) return;
             if (!_isReady || _gameBoard.SelectedCell.X == -1 || !_playing) return;
             var selectedCell = _gameBoard.Board[_gameBoard.SelectedCell.X][_gameBoard.SelectedCell.Y];
             if (_gameBoard.SelectedCell.X >= GameBoard.BoardSize)

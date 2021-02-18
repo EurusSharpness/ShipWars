@@ -106,8 +106,8 @@ namespace Server
                     send = new Message {Code = Codes.WaitingForPlayer};
                     player.Write(send);
                     while (_playersReady < 2){}
-
-                    send.Code = Codes.StartPlaying;
+                    Console.WriteLine($"Out of the while fellas {player.PlayerId}");
+                    send = new Message {Code = Codes.StartPlaying};
                     player.Write(send);
                     while (true)
                     {
@@ -120,6 +120,8 @@ namespace Server
                             if (_playerTurn == player.PlayerId)
                             {
                                 CellCliecked(receive.Row, receive.Column);
+                                Console.WriteLine($"Player #{player.PlayerId} has clicked the cell {receive.Row} {receive.Column} {_gameBoard[receive.Row][receive.Column].HasShip}\n" +
+                                                  $"Player #1 HP = {_p1.HitPoints}   Player #2 HP = {_p2.HitPoints}");
                             }
                             else
                             {
@@ -131,9 +133,7 @@ namespace Server
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($@"something went wrong
-{e.Message}
-{e.StackTrace}");
+                    Console.WriteLine($"something went wrong\n{e.Message}\n{e.StackTrace}");
                     var send = new Message{Code = Codes.Disconnected};
                     _p1.Write(send);
                     _p2.Write(send);
@@ -146,8 +146,8 @@ namespace Server
                 var updateBoard = new Message
                 {
                     Code = Codes.UpdateBoard,
-                    HasShip = _gameBoard[row][col].HasShip,
                     Row = row + BoardSize * (_playerTurn == _p1.PlayerId ? 0 : 1),
+                    HasShip = _gameBoard[row  + (_playerTurn == 1 ? BoardSize : 0) ][col].HasShip,
                     Column = col
                 };
 
@@ -192,15 +192,18 @@ namespace Server
 
             private void ShipsToBoard(Player p, Message message)
             {
+                Console.WriteLine("got here\n----------------------------------------------------------");
+
                 for (var i = 0; i < BoardSize; i++)
                 {
                     for (var j = 0; j < BoardSize; j++)
                     {
-                        _gameBoard[i + BoardSize * (p.PlayerId - 1)][j].HasShip = message.Matrix[i][j];
-                        // Console.Write($"{message.Matrix[i][j].ToString()}, ");
+                        Console.Write($"{message.Matrix[i][j].ToString()}, ");
+                        _gameBoard[i + BoardSize * (p.PlayerId - 1)][j] = new Cell(message.Matrix[i][j], false);
                     }
-                    // Console.WriteLine();
+                    Console.WriteLine();
                 }
+                Console.WriteLine("----------------------------------------------------------");
             }
 
             private void CloseGame()

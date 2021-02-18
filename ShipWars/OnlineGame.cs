@@ -73,13 +73,20 @@ namespace ShipWars
                 }
                 else
                 {
-                    _playing = true;
                     StartButton.Enabled = false;
                     StartButton.Visible = false;
                     ShipWarsForm.Collection.RemoveByKey("RandomButton");
                     ShipsToBoard();
                     StartButton.Dispose();
-                    Message send = new Message {Code = Codes.PlayerIsReady};
+                    var send = new Message {Code = Codes.PlayerIsReady, Matrix = new bool[GameBoard.BoardSize][]};
+                    for (var i = 0; i < GameBoard.BoardSize; i++)
+                    {
+                        send.Matrix[i] = new bool[GameBoard.BoardSize];
+                        for (var j = 0; j < GameBoard.BoardSize; j++)
+                        {
+                            send.Matrix[i][j] = _gameBoard.Board[i + GameBoard.BoardSize][j].ShipOverMe;
+                        }
+                    }
                     Write(send);
                 }
             };
@@ -91,6 +98,8 @@ namespace ShipWars
                 try
                 {
                     var received = Read();
+                    if (received == null)
+                        continue;
                     _message = ($"received Code = {received.Code}");
                     _status = received.Code;
                     switch (_status)
@@ -104,6 +113,8 @@ namespace ShipWars
                         case Codes.WaitingForPlayer:
                             break;
                         case Codes.UpdateBoard:
+                            _gameBoard.Board[received.Row][received.Column].ShipOverMe = received.HasShip;
+                            _gameBoard.Board[received.Row][received.Column].MouseClick();
                             break;
                         case Codes.YouLost:
                         case Codes.YouWon:
@@ -119,14 +130,15 @@ namespace ShipWars
                         case Codes.CellClicked:
                             break;
                         case Codes.NotYourTurn:
+                            _message = Messages.NotYourTurn;
                             break;
                         case Codes.CellDestroyed:
                             break;
                         case Codes.Disconnected:
                             break;
                         case Codes.StartPlaying:
-                            break;
-                        default:
+                            assembleFleet = false;
+                            _playing = true;
                             break;
                     }
                 }
@@ -141,46 +153,14 @@ namespace ShipWars
 
         private void WriterHandler()
         {
+            return;
             var send = new Message();
             while (_client?.Connected != null && (bool) _client?.Connected)
             {
                 try
                 {
-                    if (_status == Codes.GameIsReady)
-                    {
-                        send.Code = Codes.PlayerIsReady;
-                        send.Matrix = new bool[14][];
-                        for (int i = 0; i < 14; i++)
-                        {
-                            
-                        }
-
-                        if (!_isReady)
-                            continue;
-                        Write(send);
-                        _playing = true;
-                        _status = Codes.WaitingForPlayer;
-                    }
-
                     if (_playing)
                     {
-                        int row, col;
-                        do
-                        {
-                            AGAIN:
-                            if (!int.TryParse(Console.ReadLine(), out row))
-                                goto AGAIN;
-                            if (!int.TryParse(Console.ReadLine(), out col))
-                                goto AGAIN;
-                        } while (row < 0 || row > 13 || col < 0 || col > 13);
-
-                        send = new Message
-                        {
-                            Code = Codes.CellClicked,
-                            Row = row,
-                            Column = col,
-                        };
-                        Write(send);
                     }
                 }
                 catch (Exception e)
@@ -194,6 +174,21 @@ namespace ShipWars
 
         public override void MouseDown(MouseEventArgs e)
         {
+            if(e.Button != MouseButtons.Left) return;
+            if (!_isReady || _gameBoard.SelectedCell.X == -1 || !_playing) return;
+            var selectedCell = _gameBoard.Board[_gameBoard.SelectedCell.X][_gameBoard.SelectedCell.Y];
+            if(selectedCell.Destroyed) return;
+            if (_gameBoard.SelectedCell.X >= GameBoard.BoardSize)
+            {
+                _messageFlag = true;
+                _alpha = 255;
+                _message = Messages.SelectFromEnemy;
+                return;
+            }
+
+            var send = new Message
+                {Code = Codes.CellClicked, Column = _gameBoard.SelectedCell.Y, Row = _gameBoard.SelectedCell.X};
+            Write(send);
         }
 
         public override void Draw(Graphics g)
@@ -202,6 +197,8 @@ namespace ShipWars
             DrawMsg(g);
             if (assembleFleet)
                 Player.Draw(g);
+            if(_playing)
+                _gameBoard.Draw(g);
         }
 
         private void DrawMsg(Graphics g)
@@ -231,9 +228,9 @@ namespace ShipWars
                 var data = GetBytes(message);
                 _stream.Write(data, 0, data.Length);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception("Server or Client are not doing fine");
+                throw new Exception($"Server or Client are not doing fine\n{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -246,9 +243,9 @@ namespace ShipWars
                 var json = Encoding.ASCII.GetString(data, 0, len);
                 return JsonConvert.DeserializeObject<Message>(json);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception("Server or Client are not doing fine");
+                return null;
             }
         }
 

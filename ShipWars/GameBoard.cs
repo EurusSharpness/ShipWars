@@ -166,9 +166,8 @@ namespace ShipWars
             }
             
             /// <summary>Destroy the cell and check if it had a ship over it</summary>
-            public void MouseClick(MouseEventArgs e)
+            public void MouseClick(MouseEventArgs e = null)
             {
-                if (e.Button != MouseButtons.Left) return;
                 Destroyed = true;
                 Color = (ShipOverMe) ? Brushes.DarkRed : Brushes.DeepSkyBlue;
             }
