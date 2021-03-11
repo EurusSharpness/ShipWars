@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Windows.Forms;
 
 namespace ShipWars
@@ -23,18 +24,34 @@ namespace ShipWars
         private Button _back, _vsComp, _vsPlayer;
 
         public Menus Menu;
+        
+        private Bitmap MainBackgound_img, HelpBackground_img;
 
-        private const string Instructions =
-            "1: Place your ships, your ships can be rotated sideways\n" +
+        /*private const string Instructions =
+            "1: Place your ships, your ships can be rotated sideways (by clicking on them)\n" +
             "2: Destroy enemy ships by selecting one of the undestroyed cells on the enemy map.\n" +
-            "3: Destroy the enemy ships before they destroy you.";
+            "3: Destroy the enemy ships before they destroy you.";*/
 
         public MainMenu()
         {
             Menu = Menus.Main;
+            CreateImages();
             CreateButtons();
         }
+        private void CreateImages()
+        {
+            MainBackgound_img = new Bitmap(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height,
+                PixelFormat.Format24bppRgb);
+            var g = Graphics.FromImage(MainBackgound_img);
+            var image = Properties.Resources.MainBG2;
+            g.DrawImage(image, new RectangleF(new Point(0, 0), new SizeF(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)));
 
+            HelpBackground_img = new Bitmap(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height,
+                PixelFormat.Format24bppRgb);
+            g = Graphics.FromImage(HelpBackground_img);
+            image = Properties.Resources.HelpPage;
+            g.DrawImage(image, new RectangleF(new Point(0, 0), new SizeF(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)));
+        }
         public void Draw(Graphics g)
         {
             switch (Menu)
@@ -71,7 +88,7 @@ namespace ShipWars
         private void DrawMainPage(Graphics g)
         {
             // Relocate them to make sure its relocated to the center if the user changed the client size.
-
+            g.DrawImage(MainBackgound_img, new PointF(0, 0));
             _settings.Location = new Point(GetHalf(ShipWarsForm.CanvasSize,
                 TextRenderer.MeasureText(_settings.Text, _settings.Font)));
 
@@ -90,18 +107,25 @@ namespace ShipWars
         private void DrawHelpPage(Graphics g)
         {
             _back.Visible = _back.Enabled = true;
-            var format1 = new StringFormat(StringFormatFlags.NoClip)
-            {
-                LineAlignment = StringAlignment.Near,
-                Alignment = StringAlignment.Near
-            };
+            // var format1 = new StringFormat(StringFormatFlags.NoClip)
+            // {
+            //     LineAlignment = StringAlignment.Near,
+            //     Alignment = StringAlignment.Near
+            // };
+            //
+            // g.DrawString(Instructions,
+            //     new Font("", ShipWarsForm.CanvasSize.Width * 0.015f),
+            //     Brushes.DarkSeaGreen,
+            //     new Rectangle(new Point(0, 100),
+            //         new Size(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)),
+            //     format1);
+            var Size = TextRenderer.MeasureText("LE HELPO PAGE",
+                new Font("Arial", 30, FontStyle.Italic | FontStyle.Bold));
 
-            g.DrawString(Instructions,
-                new Font("", ShipWarsForm.CanvasSize.Width * 0.015f),
-                Brushes.Red,
-                new Rectangle(new Point(0, 100),
-                    new Size(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)),
-                format1);
+            g.DrawString("LE HELPO PAGE", new Font("Arial", 30, FontStyle.Bold | FontStyle.Italic), Brushes.MidnightBlue, new PointF(
+                ShipWarsForm.CanvasSize.Width / 2 - Size.Width / 2,  20
+                ));
+            g.DrawImage(HelpBackground_img, new PointF(0,100));
         }
 
         private void DrawSettingsPage(Graphics g)
@@ -111,6 +135,8 @@ namespace ShipWars
 
         private void DrawStartPage(Graphics g)
         {
+            //g.DrawImage(Properties.Resources.StartBackground, new RectangleF(new PointF(0,0), new SizeF(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)));
+            g.FillRectangle(Brushes.LightSkyBlue, new Rectangle(new Point(0,0),new Size(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) ));
             _vsComp.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - _vsComp.Width) / 2,
                 (ShipWarsForm.CanvasSize.Height - _vsComp.Height) / 2 - _vsComp.Height);
@@ -124,7 +150,7 @@ namespace ShipWars
 
         private void DrawGamePage(Graphics g)
         {
-            _back.Visible = _back.Enabled = true;
+            //_back.Visible = _back.Enabled = true;
         }
 
         #endregion DrawPages
@@ -202,7 +228,10 @@ namespace ShipWars
 
         private void CreateBackButton()
         {
-            _back = BasicButton("<==");
+            _back = BasicButton("↫");
+            _back.Font = new Font("Times New Roman", ShipWarsForm.CanvasSize.Height / 12f,
+                FontStyle.Italic | FontStyle.Bold);
+
             _back.MouseClick += (sender, args) =>
             {
                 Disable();
@@ -234,7 +263,7 @@ namespace ShipWars
             var b = new Button
             {
                 Text = text,
-                Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 20f, FontStyle.Italic | FontStyle.Bold),
+                Font = new Font("Times New Roman", ShipWarsForm.CanvasSize.Height / 20f, FontStyle.Italic | FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.Transparent,
                 ForeColor = Color.Blue,
@@ -242,7 +271,7 @@ namespace ShipWars
                 AutoSize = true,
                 Enabled = false,
                 Visible = false,
-                Size = TextRenderer.MeasureText(text, new Font("ALGERIAN", 24, FontStyle.Italic | FontStyle.Bold))
+                Size = TextRenderer.MeasureText(text, new Font("Times New Roman", 24, FontStyle.Italic | FontStyle.Bold))
             };
 
             // Make it transparent

@@ -30,6 +30,8 @@ namespace ShipWars
         public bool PlayAgain;
         public bool BackToMainMenu;
         protected Button StartButton;
+        
+        
         public Game()
         {
             
@@ -46,17 +48,17 @@ namespace ShipWars
                 Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 24f, FontStyle.Italic | FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.Transparent,
-                ForeColor = Color.Blue,
+                ForeColor = Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
             StartButton.Size = TextRenderer.MeasureText(StartButton.Text, StartButton.Font);
             StartButton.FlatAppearance.BorderSize = 0;
             StartButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            StartButton.FlatAppearance.MouseDownBackColor = Color.FromArgb(50, Color.LightGray);
-            StartButton.MouseEnter += (s, e) => { StartButton.ForeColor = Color.Red; };
-            StartButton.MouseLeave += (s, e) => { StartButton.ForeColor = Color.Blue; };
-            
+            StartButton.FlatAppearance.MouseDownBackColor = Color.Transparent;
+            StartButton.MouseEnter += (s, e) => { StartButton.ForeColor = Color.Gold; };
+            StartButton.MouseLeave += (s, e) => { StartButton.ForeColor = Color.Black; };
+            StartButton.MouseDown += (sender, args) => StartButton.ForeColor = Color.Gold;
             StartButton.MouseUp += (ppp, eee) =>
             {
                 if (Form.ActiveForm != null) Form.ActiveForm.ActiveControl = null;

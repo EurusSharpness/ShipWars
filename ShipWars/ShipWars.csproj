@@ -97,10 +97,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\TestShip.png" />
     <None Include="Resources\WaterBackground.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\MainBG2.png" />
+    <None Include="Resources\PlayLeMusic.wav" />
+    <Content Include="Resources\StartPageImg.jfif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

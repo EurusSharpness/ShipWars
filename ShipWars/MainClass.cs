@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
+using System.Media;
 
 namespace ShipWars
 {
@@ -7,11 +9,13 @@ namespace ShipWars
     {
         public MainMenu MainMenu;
         public Game Game;
-
+        SoundPlayer soundPlayer;
         public MainClass()
         {
             MainMenu = new MainMenu();
             Game = null;
+            soundPlayer = new SoundPlayer(Properties.Resources.PlayLeMusic);
+            soundPlayer.Play();
         }
 
         public void Draw(Graphics g)
@@ -32,16 +36,24 @@ namespace ShipWars
             }
             if (MainMenu.Menu == Menus.GameOnline)
             {
-                Game ??= new OnlineGame();
-                if (Game.PlayAgain)
-                    Game = new OnlineGame();
-                if (Game.BackToMainMenu)
+                try
                 {
-                    Game = null;
-                    MainMenu.Menu = Menus.Main;
-                    return;
+                    Game ??= new OnlineGame();
+                    if (Game.PlayAgain)
+                        Game = new OnlineGame();
+                    if (Game.BackToMainMenu)
+                    {
+                        Game = null;
+                        MainMenu.Menu = Menus.Main;
+                        return;
+                    }
+                    Game.Draw(g);
                 }
-                Game.Draw(g);
+                catch (Exception)
+                {
+                    MainMenu.Menu = Menus.Main;
+                    MessageBox.Show(@"Server is offline, try again later ☺", @"STOOOOOP", MessageBoxButtons.OK);
+                }
             }
             else MainMenu.Draw(g);
         }

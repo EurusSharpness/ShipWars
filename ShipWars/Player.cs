@@ -26,7 +26,7 @@ namespace ShipWars
         /// <summary> Number of lives the player has, 3+4+4+5+10+6 </summary>
         public int HealthPoints = 32;
 
-        public Button randomFleet;
+        public Button randomFleet;  
         /// <summary>
         /// 
         /// </summary>
@@ -50,18 +50,18 @@ namespace ShipWars
                 AutoSize = true,
                 Font = new Font("ALGERIAN", ShipWarsForm.CanvasSize.Height / 24f, FontStyle.Italic | FontStyle.Bold),
                 FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.Black,
                 BackColor = Color.Transparent,
                 FlatAppearance = {BorderSize = 0},
             };
             randomFleet.FlatAppearance.MouseDownBackColor = Color.Transparent;
             randomFleet.FlatAppearance.MouseOverBackColor = Color.Transparent;
-            randomFleet.MouseEnter += (sender, args) => randomFleet.ForeColor = Color.Aquamarine;
+            randomFleet.MouseEnter += (sender, args) => randomFleet.ForeColor = Color.Gold;
             randomFleet.MouseLeave += (sender, args) => randomFleet.ForeColor = Color.Black;
             randomFleet.MouseClick += (sender, args) => GenerateRandomFleet();
             randomFleet.MouseDown += (sender, args) => randomFleet.ForeColor = Color.Gold;
             randomFleet.MouseUp += (sender, args) =>
             {
-                randomFleet.ForeColor = Color.Aquamarine;
                 if (Form.ActiveForm != null) Form.ActiveForm.ActiveControl = null;
             };
             randomFleet.Size = TextRenderer.MeasureText(randomFleet.Text, randomFleet.Font);

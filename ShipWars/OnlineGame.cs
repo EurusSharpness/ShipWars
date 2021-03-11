@@ -16,7 +16,7 @@ namespace ShipWars
         private TcpClient _client;
         private readonly NetworkStream _stream;
         private Codes _status;
-        private bool _playing, assembleFleet;
+        private bool  assembleFleet;
         private readonly Thread _writer;
 
         public OnlineGame()
@@ -153,22 +153,7 @@ namespace ShipWars
 
         private void WriterHandler()
         {
-            return;
-            var send = new Message();
-            while (_client?.Connected != null && (bool) _client?.Connected)
-            {
-                try
-                {
-                    if (_playing)
-                    {
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($@"Writer Thread faced and exception, {e.Message}");
-                    return;
-                }
-            }
+            
         }
 
 
@@ -177,7 +162,11 @@ namespace ShipWars
             if(e.Button != MouseButtons.Left) return;
             if (!_isReady || _gameBoard.SelectedCell.X == -1 || !_playing) return;
             var selectedCell = _gameBoard.Board[_gameBoard.SelectedCell.X][_gameBoard.SelectedCell.Y];
-            if(selectedCell.Destroyed) return;
+            if (selectedCell.Destroyed)
+            {
+                _message += Messages.CellAlreadyDestroyed;
+                return;
+            }
             if (_gameBoard.SelectedCell.X >= GameBoard.BoardSize)
             {
                 _messageFlag = true;
@@ -243,7 +232,7 @@ namespace ShipWars
                 var json = Encoding.ASCII.GetString(data, 0, len);
                 return JsonConvert.DeserializeObject<Message>(json);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

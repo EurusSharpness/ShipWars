@@ -96,7 +96,7 @@ namespace ShipWars
             _gameBoard.Draw(g);
             var font = new Font(FontFamily.GenericMonospace, 28, FontStyle.Bold);
             g.DrawString(@"Player Health: " + _player.HealthPoints + "\n\nEnemy Health: " + _enemy.HealthPoints, font,
-                Brushes.DarkTurquoise, new PointF(0, 100));
+                Brushes.GhostWhite, new PointF(0, 100));
             DrawGameOver(g);
         }
     }

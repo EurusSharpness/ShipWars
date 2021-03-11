@@ -63,10 +63,29 @@ namespace ShipWars.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap TestShip {
+        public static System.Drawing.Bitmap HelpPage {
             get {
-                object obj = ResourceManager.GetObject("TestShip", resourceCulture);
+                object obj = ResourceManager.GetObject("HelpPage", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap MainBG2 {
+            get {
+                object obj = ResourceManager.GetObject("MainBG2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        public static System.IO.UnmanagedMemoryStream PlayLeMusic {
+            get {
+                return ResourceManager.GetStream("PlayLeMusic", resourceCulture);
             }
         }
         
