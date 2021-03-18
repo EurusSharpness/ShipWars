@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 
 namespace ShipWars
 {
@@ -8,11 +9,21 @@ namespace ShipWars
     /// </summary>
     public class GameBackground
     {
-        private float _x;
+        private float _x = 0;
         private Bitmap _background;
+        Timer t;
         public GameBackground()
         {
             CreateBackground();
+            t = new Timer();
+            t.Interval = 10;
+            t.Tick += T_Tick;
+            t.Start();
+        }
+
+        private void T_Tick(object sender, System.EventArgs e)
+        {
+            _x = (_x < ShipWarsForm.CanvasSize.Width) ? _x + 0.8f : 0;
         }
 
         /// <summary>
@@ -21,7 +32,7 @@ namespace ShipWars
         private void CreateBackground()
         {
             _background = new Bitmap(ShipWarsForm.CanvasSize.Width * 2, ShipWarsForm.CanvasSize.Height,
-                PixelFormat.Format32bppArgb);
+                PixelFormat.Format24bppRgb);
             using var g = Graphics.FromImage(_background);
             var image = Properties.Resources.WaterBackground;
             int x = 0, y = 0;
@@ -47,7 +58,6 @@ namespace ShipWars
 
         public void Draw(Graphics g)
         {
-            _x = (_x < ShipWarsForm.CanvasSize.Width) ? _x + 1.5f : 0;
             g.DrawImage(_background, _x - ShipWarsForm.CanvasSize.Width, 0);
         }
     }

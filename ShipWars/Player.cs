@@ -10,11 +10,11 @@ namespace ShipWars
     public class Player
     {
         /// <summary> Ship numbers, type of the ship: 3x1, 4x1, 4x1, 5x1, 5x2, 6x1 </summary>
-        private const int NumberOfShips = 6; 
+        public const int NumberOfShips = 6; 
         /// <summary> The ships of the player and their location on board </summary>
         public BattleShip[] BattleShips;
         /// <summary> the size of the cell </summary>
-        private const int Dt = 30; 
+        public const int Dt = 30; 
         /// <summary> The board starting Y </summary>
         private static int _dy;
         /// <summary> The board starting X </summary>
@@ -76,12 +76,12 @@ namespace ShipWars
         /// </summary>
         private void InitShips()
         {
-            BattleShips[0] = new BattleShip(1, 3, new Point(30, 50), Color.LightGreen);
-            BattleShips[1] = new BattleShip(1, 4, new Point(90, 50), Color.DarkOliveGreen);
-            BattleShips[2] = new BattleShip(1, 4, new Point(150, 50), Color.Chartreuse);
-            BattleShips[3] = new BattleShip(5, 1, new Point(30, 200), Color.SpringGreen);
-            BattleShips[4] = new BattleShip(5, 2, new Point(30, 260), Color.Goldenrod);
-            BattleShips[5] = new BattleShip(6, 1, new Point(30, 340), Color.Chocolate);
+            BattleShips[0] = new BattleShip(1, 3, new Point(30, 50), Color.LightGreen, new Bitmap(Properties.Resources.Ship3x1));
+            BattleShips[1] = new BattleShip(1, 4, new Point(90, 50), Color.DarkOliveGreen, new Bitmap(Properties.Resources.Ship4x1V1));
+            BattleShips[2] = new BattleShip(1, 4, new Point(150, 50), Color.Chartreuse, new Bitmap(Properties.Resources.Ship4x1V2));
+            BattleShips[3] = new BattleShip(1, 5, new Point(30, 200), Color.SpringGreen, new Bitmap(Properties.Resources.Ship5x1));
+            BattleShips[4] = new BattleShip(2, 5, new Point(90, 200), Color.Goldenrod, new Bitmap(Properties.Resources.Ship5x2));
+            BattleShips[5] = new BattleShip(6, 1, new Point(30, 380), Color.Chocolate, new Bitmap(Properties.Resources.Ship6x1));
             
             // Add mouse functionality to each button.
             foreach (var ship in BattleShips)
@@ -123,28 +123,35 @@ namespace ShipWars
         /// <returns></returns>
         private bool CheckShip(BattleShip b)
         {
-            var w = b.Width / Dt;
-            var h = b.Height / Dt;
-            for (var i = 0; i < h; i++)
+            try
             {
-                for (var j = 0; j < w; j++)
+                var w = b.Width / Dt;
+                var h = b.Height / Dt;
+                for (var i = 0; i < h; i++)
                 {
-                    if (!_takenCells[b.Column + j, b.Row + i]) continue;
-                    b.Reset();
-                    return false;
+                    for (var j = 0; j < w; j++)
+                    {
+                        if (!_takenCells[b.Column + j, b.Row + i]) continue;
+                        b.Reset();
+                        return false;
+                    }
+                }
+
+                for (var i = 0; i < h; i++)
+                {
+                    for (var j = 0; j < w; j++)
+                    {
+                        _takenCells[b.Column + j, b.Row + i] = true;
+                        b.IndexPoints.Add(new Point(b.Column + j, b.Row + i));
+                    }
                 }
             }
-
-            for (var i = 0; i < h; i++)
+            catch (IndexOutOfRangeException)
             {
-                for (var j = 0; j < w; j++)
-                {
-                    _takenCells[b.Column + j, b.Row + i] = true;
-                    b.IndexPoints.Add(new Point(b.Column + j, b.Row + i));
-                }
+                return false;
             }
-
             b.Location = new Point(_dx + b.Column * Dt, _dy + b.Row * Dt);
+
             return true;
         }
 
@@ -234,18 +241,20 @@ namespace ShipWars
 
             foreach (var ship in BattleShips)
             {
-                REPEAT:
+            REPEAT:
                 // Do turn, if the ship is horizontal or vertical
                 var flag = rand.Next(0, 2) == 0;
                 if (flag)
-                    (ship.Width, ship.Height) = (ship.Height, ship.Width);
+                    ship.Rotate();
                 // Pick a point that does not exceed the board max size, 13.
                 var col = rand.Next(0, GameBoard.BoardSize - ship.Width / Dt + 1);
                 var row = rand.Next(0, GameBoard.BoardSize - ship.Height / Dt + 1);
                 // Check if it was a legit move or not.
                 if (AddShip(ship, row, col)) continue;
                 if (flag) // return the state of the ship
-                    (ship.Width, ship.Height) = (ship.Height, ship.Width);
+                {
+                    ship.Rotate();
+                }
 
                 goto REPEAT; // pick another location.
             }
@@ -258,9 +267,13 @@ namespace ShipWars
         public static void Draw(Graphics g)
         {
             for (var i = 0; i < GameBoard.BoardSize; i++)
-            for (var j = 0; j < GameBoard.BoardSize; j++)
-                g.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(new Point(
-                    _dx + i * Dt, _dy + j * Dt), new Size(Dt, Dt)));
+            {
+                for (var j = 0; j < GameBoard.BoardSize; j++)
+                {
+                    g.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(new Point(
+                        _dx + i * Dt, _dy + j * Dt), new Size(Dt, Dt)));
+                }
+            }
         }
 
         /// <summary>
@@ -288,7 +301,8 @@ namespace ShipWars
             private bool _btnDragging;
             /// <summary>Flip the ship</summary>
             private bool _doTurn;
-
+            //
+            public Bitmap shipImage;
             /// <summary>
             /// Initialize the ship with standard proprieties.
             /// </summary>
@@ -296,7 +310,7 @@ namespace ShipWars
             /// <param name="height">Relative to the board, how many cells high</param>
             /// <param name="location">Starting location.</param>
             /// <param name="c">The color of the ship</param>
-            public BattleShip(int width, int height, Point location, Color c)
+            public BattleShip(int width, int height, Point location, Color c, Bitmap img = null)
             {
                 Row = Column = -1;
                 IndexPoints = new List<Point>();
@@ -306,12 +320,25 @@ namespace ShipWars
                 FlatStyle = FlatStyle.Flat;
                 Enabled = true;
                 Visible = true;
-                BackColor = c;
+                BackColor = Color.Transparent;
                 ResizeRedraw = false;
                 Location = location;
                 DoubleBuffered = true;
+                shipImage = img;
+                if(img != null)
+                    Image = new Bitmap(img, new Size(Math.Min(Width, Height), Math.Max(Width, Height)));
+                if(Height < Width)
+                    Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                
+                //ImageAlign = ContentAlignment.TopCenter;
                 MouseDown += B_MouseDown;
                 MouseMove += B_MouseMove;
+                FlatStyle = FlatStyle.Flat;
+                ForeColor = Color.Black;
+                BackColor = Color.Transparent;
+                FlatAppearance.BorderSize = 0;
+                FlatAppearance.MouseDownBackColor = Color.Transparent;
+                FlatAppearance.MouseOverBackColor = Color.Transparent;
             }
 
             /// <summary>
@@ -324,7 +351,9 @@ namespace ShipWars
                 // Remove focus from controller
                 if (Form.ActiveForm != null) Form.ActiveForm.ActiveControl = null;
                 if (_doTurn)
-                    (Height, Width) = (Width, Height);
+                {
+                    Rotate();
+                }
             }
 
             /// <summary>
@@ -362,6 +391,14 @@ namespace ShipWars
                 Row = Column = -1;
                 Location = _originLocation;
                 IndexPoints.Clear();
+            }
+
+            internal void Rotate()
+            {
+                (Height, Width) = (Width, Height);
+                Image = new Bitmap(shipImage, new Size(Math.Min(Width, Height), Math.Max(Width, Height)));
+                if (Height < Width)
+                    Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
             }
         }
     }

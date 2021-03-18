@@ -10,21 +10,23 @@ namespace ShipWars
         private readonly Matrix _matrix;
 
         
-        private readonly float _cellSize;
+        public readonly float _cellSize;
         public const int BoardSize = 14;
         private const int Angle = 45;
         private readonly float _dx;
         private readonly float _dy;
         public Cell[][] Board;
         public Point SelectedCell;
-
+        public PlayerShips[] playerShips;
         public GameBoard()
         {
             _matrix = new Matrix();
             _cellSize = Math.Min(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) * 0.029f;
+            //_cellSize = 20;
             SelectedCell = new Point(-1, -1);
             _dy = _cellSize * (BoardSize + 2);
             _dx = ShipWarsForm.CanvasSize.Width * 0.5f;
+            playerShips = new PlayerShips[Player.NumberOfShips];
             CreateBoard();
         }
 
@@ -56,12 +58,10 @@ namespace ShipWars
         private void RotateRectangles(Graphics g)
         {
             g.Transform = _matrix;
-            
-            // Draw the little golden square.
-            /*if (SelectedCell.X != -1)
-                g.FillRectangle(Brushes.Gold, Board[SelectedCell.X][SelectedCell.Y].Rect);*/
             var i = 0;
             var flag = false;
+            var p = new Pen(Brushes.Black, 2.5f);
+            
             foreach (var rect in Board)
             {
                 var j = 0;
@@ -75,7 +75,7 @@ namespace ShipWars
                         flag = true;
                     }
                     g.FillRectangle(t.Color, t.Rect);
-                    g.DrawRectangle(new Pen(Brushes.Black, 2.5f), t.Rect.X, t.Rect.Y,
+                    g.DrawRectangle(p, t.Rect.X, t.Rect.Y,
                         t.Rect.Width, t.Rect.Height);
                     j++;
                 }
@@ -84,6 +84,15 @@ namespace ShipWars
 
             if (!flag)
                 (SelectedCell.X, SelectedCell.Y) = (-1, -1); // Cell not selected
+
+            // <---- Draw Ships ----->
+            
+            foreach(var ship in playerShips)
+            {
+                if (ship == null) continue;
+                g.DrawImage(ship.Image, ship.rectangle);
+            }
+
             // return drawings to normal.
             g.ResetTransform();
         }
@@ -171,6 +180,16 @@ namespace ShipWars
                 Destroyed = true;
                 Color = (ShipOverMe) ? Brushes.DarkRed : Brushes.DeepSkyBlue;
             }
+        }
+
+        public class PlayerShips
+        {
+            public Point Cords { get; set; }
+            public Size size { get; set; }
+            public Image Image { get; set; }
+
+            public RectangleF rectangle { get; set; }
+
         }
     }
 }

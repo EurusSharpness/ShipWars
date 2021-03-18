@@ -39,6 +39,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -103,8 +104,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\MainBG2.png" />
+    <None Include="Resources\Ship6x1.png" />
+    <None Include="Resources\Ship5x2.png" />
+    <None Include="Resources\Ship5x1.png" />
+    <None Include="Resources\Ship4x1V2.png" />
+    <None Include="Resources\Ship4x1V1.png" />
+    <None Include="Resources\Ship3x1.png" />
+    <None Include="Resources\Ship1_auto_x2.png" />
     <None Include="Resources\PlayLeMusic.wav" />
-    <Content Include="Resources\StartPageImg.jfif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

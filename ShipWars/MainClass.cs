@@ -10,17 +10,17 @@ namespace ShipWars
         public MainMenu MainMenu;
         public Game Game;
         SoundPlayer soundPlayer;
+        private bool flag = false;
         public MainClass()
         {
             MainMenu = new MainMenu();
             Game = null;
             soundPlayer = new SoundPlayer(Properties.Resources.PlayLeMusic);
-            soundPlayer.Play();
+            //soundPlayer.Play();
         }
 
         public void Draw(Graphics g)
         {
-
             if (MainMenu.Menu == Menus.GameOffline)
             {
                 Game ??= new OfflineGame();
@@ -74,6 +74,12 @@ namespace ShipWars
         {
             if (MainMenu.Menu == Menus.GameOffline || MainMenu.Menu == Menus.GameOnline)
                 Game?.MouseDown(e);
+        }
+
+        public void KeyDown(KeyEventArgs e)
+        {
+            if (MainMenu.Menu == Menus.GameOffline || MainMenu.Menu == Menus.GameOnline)
+                Game?.KeyDown(e);
         }
     }
 }

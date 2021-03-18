@@ -30,7 +30,8 @@ namespace ShipWars
         public bool PlayAgain;
         public bool BackToMainMenu;
         protected Button StartButton;
-        
+
+        protected bool _Pausing = false;
         
         public Game()
         {
@@ -76,6 +77,8 @@ namespace ShipWars
         /// </summary>
         protected virtual void ShipsToBoard()
         {
+
+            // <---- ENEMY ---->
             foreach (var ship in _enemy.BattleShips)
             {
                 foreach (var cell in ship.IndexPoints.Select(index => _gameBoard.Board[index.Y][index.X]))
@@ -88,8 +91,36 @@ namespace ShipWars
                 ship.Dispose();
             }
 
+
+
+            // <---- Player ---->
+            int i = 0;
             foreach (var ship in _player.BattleShips)
             {
+                // Width and Height are the ship length in cells   e.g   3x1 | 4x1 | 5x2 ....
+                var (Width, Height) = (ship.Width / Player.Dt, ship.Height / Player.Dt);
+                PointF point;
+                SizeF size = new SizeF(Height * _gameBoard._cellSize, Width * _gameBoard._cellSize); // create the size that fit the picture.s
+                ship.shipImage.RotateFlip(RotateFlipType.Rotate270FlipNone); // fix the picture rotation.
+
+
+                // if the ship is vertical, after the transform the ship will be horizinal so when drawing it, the rectangle that capture it Starts from the same XY.
+                if (Width < Height)
+                {
+                    point = new PointF(_gameBoard.Board[GameBoard.BoardSize + ship.IndexPoints[0].Y][ship.IndexPoints[0].X].Rect.X, _gameBoard.Board[GameBoard.BoardSize + ship.IndexPoints[0].Y][ship.IndexPoints[0].X].Rect.Y);
+                } // else it'll be vertical after the tranform, so its Y will be 'Width' cells up. and rotate it bt 90 degress so that's 360 to return it to the way it was.
+                else
+                {
+                    point = new PointF(_gameBoard.Board[GameBoard.BoardSize + ship.IndexPoints[0].Y][ship.IndexPoints[0].X].Rect.X, _gameBoard.Board[GameBoard.BoardSize + ship.IndexPoints[0].Y][ship.IndexPoints[0].X + Width - 1].Rect.Y);
+                    ship.shipImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                }
+                if (Width == 2) // a little fix for the 5x2 ship.
+                    point.Y -= (Width - 1) * _gameBoard._cellSize;
+
+                _gameBoard.playerShips[i++] = new GameBoard.PlayerShips { Image = ship.shipImage, rectangle = new RectangleF(point, size)};
+
+
+
                 foreach (var cell in ship.IndexPoints.Select(index =>
                     _gameBoard.Board[index.Y + GameBoard.BoardSize][index.X]))
                 {
@@ -100,7 +131,7 @@ namespace ShipWars
                 ship.Dispose();
             }
 
-            _player.BattleShips = null;
+            _player.BattleShips = null; // let GC take care of the rest;
         }
 
         public void MouseMove(MouseEventArgs e)
@@ -114,7 +145,11 @@ namespace ShipWars
             if (!_isReady) return;
             _gameBoard.MouseUp(e);
         }
-
+        public void KeyDown(KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.E)
+                _Pausing = !_Pausing;
+        }
 
         /// <summary>
         /// Check if the clicked cell is in board and not destroyed.
@@ -173,6 +208,11 @@ namespace ShipWars
             if (_alpha > 0) return;
             _messageFlag = false;
             _alpha = 255;
+        }
+
+        protected void DrawGamePause(Graphics g)
+        {
+            if (!_Pausing) return;
         }
     }
 }

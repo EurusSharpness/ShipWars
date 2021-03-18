@@ -23,7 +23,7 @@ namespace ShipWars
         {
             Name = "Main";
             Activate();
-            ClientSize = new Size((int)(Screen.PrimaryScreen.Bounds.Width * 0.8), (int)(Screen.PrimaryScreen.WorkingArea.Height * 0.8));
+            ClientSize = new Size(1500, 800);
             Collection = Controls;
             CanvasSize = ClientSize;
             _mainClass = new MainClass();
@@ -39,8 +39,11 @@ namespace ShipWars
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+            /*e.Graphics.InterpolationMode = InterpolationMode.HighQualityBilinear;
+            e.Graphics.CompositingQuality = CompositingQuality.HighSpeed;*/
             CanvasSize = ClientSize;
             _mainClass.Draw(e.Graphics);
+
             //e.Graphics.DrawString($"X: {MouseCords}", new Font("", 16), Brushes.Black, 0, 0);
         }
 
@@ -58,11 +61,11 @@ namespace ShipWars
 
         private void ShipWarsForm_KeyDown(object sender, KeyEventArgs e)
         {
-            SuspendLayout();
-            if (e.KeyCode == Keys.Escape)
+            _mainClass.KeyDown(e);
+            /*if (e.KeyCode == Keys.Escape)
                 if (MessageBox.Show(@"Are you sure you want to exit?", @"Exit", MessageBoxButtons.OKCancel) ==
                  DialogResult.OK)
-                    Close();
+                    Close();*/
         }
 
         private void ShipWarsForm_MouseUp(object sender, MouseEventArgs e)
