@@ -137,6 +137,7 @@ namespace ShipWars
         {
             //g.DrawImage(Properties.Resources.StartBackground, new RectangleF(new PointF(0,0), new SizeF(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height)));
             g.FillRectangle(Brushes.LightSkyBlue, new Rectangle(new Point(0,0),new Size(ShipWarsForm.CanvasSize.Width, ShipWarsForm.CanvasSize.Height) ));
+            g.DrawImage(MainBackgound_img, new PointF(0, 0));
             _vsComp.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - _vsComp.Width) / 2,
                 (ShipWarsForm.CanvasSize.Height - _vsComp.Height) / 2 - _vsComp.Height);

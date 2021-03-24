@@ -32,10 +32,10 @@ namespace ShipWars
         protected Button StartButton;
 
         protected bool _Pausing = false;
-        
+
         public Game()
         {
-            
+
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ShipWars
             };
             StartButton.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - StartButton.Width) / 2,
-                (int) (ShipWarsForm.CanvasSize.Height * 0.87f)
+                (int)(ShipWarsForm.CanvasSize.Height * 0.87f)
             );
             ShipWarsForm.Collection.Add(StartButton);
             Form.ActiveForm?.Focus();
@@ -117,7 +117,7 @@ namespace ShipWars
                 if (Width == 2) // a little fix for the 5x2 ship.
                     point.Y -= (Width - 1) * _gameBoard._cellSize;
 
-                _gameBoard.playerShips[i++] = new GameBoard.PlayerShips { Image = ship.shipImage, rectangle = new RectangleF(point, size)};
+                _gameBoard.playerShips[i++] = new GameBoard.PlayerShips { Image = ship.shipImage, rectangle = new RectangleF(point, size) };
 
 
 
@@ -133,7 +133,7 @@ namespace ShipWars
 
             _player.BattleShips = null; // let GC take care of the rest;
         }
-
+        
         public void MouseMove(MouseEventArgs e)
         {
             if (!_isReady) return;

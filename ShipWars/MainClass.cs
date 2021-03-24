@@ -16,7 +16,7 @@ namespace ShipWars
             MainMenu = new MainMenu();
             Game = null;
             soundPlayer = new SoundPlayer(Properties.Resources.PlayLeMusic);
-            //soundPlayer.Play();
+            //soundPlayer.PlayLooping();
         }
 
         public void Draw(Graphics g)

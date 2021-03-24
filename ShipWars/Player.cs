@@ -10,11 +10,11 @@ namespace ShipWars
     public class Player
     {
         /// <summary> Ship numbers, type of the ship: 3x1, 4x1, 4x1, 5x1, 5x2, 6x1 </summary>
-        public const int NumberOfShips = 6; 
+        public const int NumberOfShips = 6;
         /// <summary> The ships of the player and their location on board </summary>
         public BattleShip[] BattleShips;
         /// <summary> the size of the cell </summary>
-        public const int Dt = 30; 
+        public const int Dt = 30;
         /// <summary> The board starting Y </summary>
         private static int _dy;
         /// <summary> The board starting X </summary>
@@ -26,7 +26,7 @@ namespace ShipWars
         /// <summary> Number of lives the player has, 3+4+4+5+10+6 </summary>
         public int HealthPoints = 32;
 
-        public Button randomFleet;  
+        public Button randomFleet;
         /// <summary>
         /// 
         /// </summary>
@@ -37,6 +37,7 @@ namespace ShipWars
             BattleShips = new BattleShip[NumberOfShips];
             _dy = ShipWarsForm.CanvasSize.Height / 2 - (GameBoard.BoardSize / 2) * Dt;
             _dx = 2 * ShipWarsForm.CanvasSize.Width / 3 - (GameBoard.BoardSize / 2) * Dt;
+            createMap();
             GRF_Button();
             InitShips();
         }
@@ -52,7 +53,7 @@ namespace ShipWars
                 FlatStyle = FlatStyle.Flat,
                 ForeColor = Color.Black,
                 BackColor = Color.Transparent,
-                FlatAppearance = {BorderSize = 0},
+                FlatAppearance = { BorderSize = 0 },
             };
             randomFleet.FlatAppearance.MouseDownBackColor = Color.Transparent;
             randomFleet.FlatAppearance.MouseOverBackColor = Color.Transparent;
@@ -67,10 +68,10 @@ namespace ShipWars
             randomFleet.Size = TextRenderer.MeasureText(randomFleet.Text, randomFleet.Font);
             randomFleet.Location = new Point(
                 (ShipWarsForm.CanvasSize.Width - randomFleet.Width) / 2,
-                (int) (ShipWarsForm.CanvasSize.Height * 0.80f)
+                (int)(ShipWarsForm.CanvasSize.Height * 0.80f)
             );
         }
-        
+
         /// <summary>
         /// Create the buttons at their starting locations, and set their properties.
         /// </summary>
@@ -82,11 +83,11 @@ namespace ShipWars
             BattleShips[3] = new BattleShip(1, 5, new Point(30, 200), Color.SpringGreen, new Bitmap(Properties.Resources.Ship5x1));
             BattleShips[4] = new BattleShip(2, 5, new Point(90, 200), Color.Goldenrod, new Bitmap(Properties.Resources.Ship5x2));
             BattleShips[5] = new BattleShip(6, 1, new Point(30, 380), Color.Chocolate, new Bitmap(Properties.Resources.Ship6x1));
-            
+
             // Add mouse functionality to each button.
             foreach (var ship in BattleShips)
                 ship.MouseUp += b_MouseUp;
-            
+
             if (!_show) return;
 
             foreach (var ship in BattleShips)
@@ -159,7 +160,7 @@ namespace ShipWars
         /// Add the ship to the board if its legal.
         /// </summary>
         /// <param name="b">The ship to add</param>
-        
+
         private void AddToBoard(BattleShip b)
         {
             // Check Bounds + Error value.
@@ -180,10 +181,10 @@ namespace ShipWars
 
             // Check if the user moved the ship more than half a square.
             // ReSharper disable PossibleLossOfFraction
-            var moveRight = ((b.Location.X - _dx) / (double) Dt) - (b.Location.X - _dx) / Dt;
+            var moveRight = ((b.Location.X - _dx) / (double)Dt) - (b.Location.X - _dx) / Dt;
             if (moveRight >= 0.5)
                 moveRight = 1;
-            var moveDown = ((b.Location.Y - _dy) / (double) Dt) - (b.Location.Y - _dy) / Dt;
+            var moveDown = ((b.Location.Y - _dy) / (double)Dt) - (b.Location.Y - _dy) / Dt;
             // ReSharper restore PossibleLossOfFraction
             if (moveDown >= 0.5)
                 moveDown = 1;
@@ -193,10 +194,10 @@ namespace ShipWars
                 moveRight = 0;
             if (deltaBottom > 0)
                 moveDown = 0;
-            
+
             // Set the row and column of the button relatively to the board.
-            b.Row = (int) moveDown + (b.Location.Y - _dy) / Dt;
-            b.Column = (int) moveRight + (b.Location.X - _dx) / Dt;
+            b.Row = (int)moveDown + (b.Location.Y - _dy) / Dt;
+            b.Column = (int)moveRight + (b.Location.X - _dx) / Dt;
 
             // Check if its legit or not.
             CheckShip(b);
@@ -264,16 +265,23 @@ namespace ShipWars
         /// Draw the board
         /// </summary>
         /// <param name="g">The graphics boi</param>
-        public static void Draw(Graphics g)
+        private static Bitmap playerBoard = new Bitmap(GameBoard.BoardSize * Dt, GameBoard.BoardSize * Dt);
+        private void createMap()
         {
+            Pen pen = new Pen(Color.Black, 5);
+            Graphics g = Graphics.FromImage(playerBoard);
+            Size size = new Size(Dt, Dt);
             for (var i = 0; i < GameBoard.BoardSize; i++)
             {
                 for (var j = 0; j < GameBoard.BoardSize; j++)
                 {
-                    g.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(new Point(
-                        _dx + i * Dt, _dy + j * Dt), new Size(Dt, Dt)));
+                    g.DrawRectangle(pen, new Rectangle(new Point(i * Dt, j * Dt), size));
                 }
             }
+        }
+        public static void Draw(Graphics g)
+        {
+            g.DrawImage(playerBoard, new PointF(_dx, _dy));
         }
 
         /// <summary>
@@ -325,11 +333,11 @@ namespace ShipWars
                 Location = location;
                 DoubleBuffered = true;
                 shipImage = img;
-                if(img != null)
+                if (img != null)
                     Image = new Bitmap(img, new Size(Math.Min(Width, Height), Math.Max(Width, Height)));
-                if(Height < Width)
+                if (Height < Width)
                     Image.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                
+
                 //ImageAlign = ContentAlignment.TopCenter;
                 MouseDown += B_MouseDown;
                 MouseMove += B_MouseMove;
@@ -368,7 +376,7 @@ namespace ShipWars
                 _btnDragging = true;
                 _doTurn = true;
             }
-            
+
             /// <summary>
             /// Change the button location according the mouse.
             /// </summary>

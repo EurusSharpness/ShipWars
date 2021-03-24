@@ -35,7 +35,7 @@ namespace ShipWars
             AutoSize = false;
             Focus();
         }
-
+        
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.HighQuality;

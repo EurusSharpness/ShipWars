@@ -44,7 +44,6 @@ namespace ShipWars
 
         private void Init()
         {
-            _background = new GameBackground();
             _gameBoard = new GameBoard();
             _enemy = new Player(false);
             StartButton.Show();

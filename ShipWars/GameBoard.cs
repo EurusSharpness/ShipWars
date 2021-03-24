@@ -8,8 +8,6 @@ namespace ShipWars
     public class GameBoard
     {
         private readonly Matrix _matrix;
-
-        
         public readonly float _cellSize;
         public const int BoardSize = 14;
         private const int Angle = 45;
@@ -61,7 +59,7 @@ namespace ShipWars
             var i = 0;
             var flag = false;
             var p = new Pen(Brushes.Black, 2.5f);
-            
+
             foreach (var rect in Board)
             {
                 var j = 0;
@@ -74,7 +72,7 @@ namespace ShipWars
                         g.FillRectangle(Brushes.Gold, t.Rect);
                         flag = true;
                     }
-                    g.FillRectangle(t.Color, t.Rect);
+                    //g.FillRectangle(t.Color, t.Rect);
                     g.DrawRectangle(p, t.Rect.X, t.Rect.Y,
                         t.Rect.Width, t.Rect.Height);
                     j++;
@@ -86,11 +84,22 @@ namespace ShipWars
                 (SelectedCell.X, SelectedCell.Y) = (-1, -1); // Cell not selected
 
             // <---- Draw Ships ----->
-            
-            foreach(var ship in playerShips)
+
+            foreach (var ship in playerShips)
             {
                 if (ship == null) continue;
                 g.DrawImage(ship.Image, ship.rectangle);
+            }
+
+            // <---- Draw Destroied Cells ---->
+            foreach (var rect in Board)
+            {
+                var j = 0;
+                foreach (var t in rect)
+                {
+                    if(t.Destroyed)
+                        g.FillRectangle(t.Color, t.Rect);
+                }
             }
 
             // return drawings to normal.
@@ -150,7 +159,7 @@ namespace ShipWars
         {
             /// <summary>Rectangle that represents the cell.</summary>
             public readonly RectangleF Rect;
-            
+
             /// <summary>If there is a ship on the cell.</summary>
             public bool ShipOverMe;
 
@@ -173,7 +182,7 @@ namespace ShipWars
             {
                 return Path.IsVisible(ShipWarsForm.MouseCords);
             }
-            
+
             /// <summary>Destroy the cell and check if it had a ship over it</summary>
             public void MouseClick(MouseEventArgs e = null)
             {
@@ -187,9 +196,7 @@ namespace ShipWars
             public Point Cords { get; set; }
             public Size size { get; set; }
             public Image Image { get; set; }
-
             public RectangleF rectangle { get; set; }
-
         }
     }
 }

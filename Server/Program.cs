@@ -24,6 +24,7 @@ namespace Server
 
         public TcpServer()
         {
+            Console.Title = @"Shipwars Server!!";
             var iPAddress = IPAddress.Parse(IpAddress);
             _listener = new TcpListener(iPAddress, Port);
             StartServer();
@@ -32,7 +33,7 @@ namespace Server
         private void StartServer()
         {
             _listener.Start();
-            Console.WriteLine($@"Server is listening on {IpAddress}@{Port.ToString()}");
+            Console.WriteLine($@"Server is listening on {IpAddress}@{Port}");
             var p1 = _listener.AcceptTcpClient();
             Console.WriteLine(@"Player 1 is connected");
             var p2 = _listener.AcceptTcpClient();
